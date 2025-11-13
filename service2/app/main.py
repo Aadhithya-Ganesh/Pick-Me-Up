@@ -86,7 +86,7 @@ async def readiness_check():
             "instance_id": settings.INSTANCE_ID,
             "reason": "Database not connected"
         }
-
+        
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(
