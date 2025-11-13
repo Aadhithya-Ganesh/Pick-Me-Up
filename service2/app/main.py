@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from app.config import settings
 from app.core.database import init_db, test_connection, get_db_health
+from app.api.v1 import bookings
 import logging
 
 # Configure logging
@@ -16,6 +17,8 @@ app = FastAPI(
     version="1.0.0",
     description="Booking Service for Carpooling Application"
 )
+
+app.include_router(bookings.router)
 
 @app.on_event("startup")
 async def startup_event():
