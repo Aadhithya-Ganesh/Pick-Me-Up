@@ -1,15 +1,9 @@
 @import "tailwindcss";
 
 @theme {
-  /* BRAND COLORS */
-  --color-primary: #ffdf20;
-  --color-secondary: #006e5e; /* best pairing */
-
-  /* NEUTRALS */
-  --color-neutral-primary: #1b3d2f;
-  --color-neutral-secondary: #4e6f66;
-
-  /* TEXT ON BRAND SURFACES */
-  --color-on-primary: #ffffff;
-  --color-on-secondary: #ffffff;
+  --color-text: #181501;
+  --color-background: #fbfaf2;
+  --color-primary: #ffdd1f;
+  --color-secondary: #fffbe5;
+  --color-accent: #f7dc44;
 }
