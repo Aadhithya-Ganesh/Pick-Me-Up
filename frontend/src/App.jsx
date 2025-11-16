@@ -3,10 +3,11 @@ import "./App.css";
 import Rootpage from "./pages/RootPage";
 import ErrorPage from "./pages/ErrorPage";
 import HomePage from "./pages/HomePage";
-import LandingPage from "./pages/LandingPage";
+import Dashboard from "./pages/Dashboard";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import NavbarRootPage from "./pages/NavbarRootPage";
+import ModeSwitchContextProvider from "./context/ModeSwitchContext";
 
 function App() {
   const routes = createBrowserRouter([
@@ -20,8 +21,8 @@ function App() {
           path: "",
           element: <NavbarRootPage />,
           children: [
-            { index: true, element: <LandingPage /> },
-            { path: "home", element: <HomePage /> },
+            { index: true, element: <HomePage /> },
+            { path: "/dashboard", element: <Dashboard /> },
           ],
         },
         { path: "login", element: <LoginPage /> },
@@ -30,7 +31,11 @@ function App() {
     },
   ]);
 
-  return <RouterProvider router={routes}></RouterProvider>;
+  return (
+    <ModeSwitchContextProvider>
+      <RouterProvider router={routes}></RouterProvider>
+    </ModeSwitchContextProvider>
+  );
 }
 
 export default App;

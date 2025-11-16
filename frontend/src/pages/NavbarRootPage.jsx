@@ -4,7 +4,7 @@ import Footer from "../components/Footer";
 
 export default function NavbarRootPage() {
   return (
-    <div className="flex min-h-screen flex-col justify-between">
+    <div className="flex min-h-screen flex-col">
       <Navbar />
       <div className="grow">
         <Outlet />
