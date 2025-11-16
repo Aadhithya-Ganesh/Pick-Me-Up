@@ -18,7 +18,7 @@ export const Footer = () => {
               <li>
                 <Link
                   to="/rides"
-                  className="text-muted-foreground hover:text-primary transition-colors"
+                  className="text-muted-foreground hover:text-accent transition-colors"
                 >
                   Find a Ride
                 </Link>
@@ -26,7 +26,7 @@ export const Footer = () => {
               <li>
                 <Link
                   to="/dashboard"
-                  className="text-muted-foreground hover:text-primary transition-colors"
+                  className="text-muted-foreground hover:text-accent transition-colors"
                 >
                   Dashboard
                 </Link>
@@ -34,7 +34,7 @@ export const Footer = () => {
               <li>
                 <Link
                   to="/"
-                  className="text-muted-foreground hover:text-primary transition-colors"
+                  className="text-muted-foreground hover:text-accent transition-colors"
                 >
                   How It Works
                 </Link>
@@ -49,7 +49,7 @@ export const Footer = () => {
               <li>
                 <a
                   href="#"
-                  className="text-muted-foreground hover:text-primary transition-colors"
+                  className="text-muted-foreground hover:text-accent transition-colors"
                 >
                   About Us
                 </a>
@@ -57,7 +57,7 @@ export const Footer = () => {
               <li>
                 <a
                   href="#"
-                  className="text-muted-foreground hover:text-primary transition-colors"
+                  className="text-muted-foreground hover:text-accent transition-colors"
                 >
                   Blog
                 </a>
@@ -65,7 +65,7 @@ export const Footer = () => {
               <li>
                 <a
                   href="#"
-                  className="text-muted-foreground hover:text-primary transition-colors"
+                  className="text-muted-foreground hover:text-accent transition-colors"
                 >
                   Careers
                 </a>
@@ -73,7 +73,7 @@ export const Footer = () => {
               <li>
                 <a
                   href="#"
-                  className="text-muted-foreground hover:text-primary transition-colors"
+                  className="text-muted-foreground hover:text-accent transition-colors"
                 >
                   Contact
                 </a>
@@ -87,25 +87,25 @@ export const Footer = () => {
             <div className="flex gap-3">
               <a
                 href="#"
-                className="border-border hover:bg-primary flex h-10 w-10 items-center justify-center rounded-lg border text-gray-400 transition-colors hover:text-white"
+                className="border-border hover:bg-primary text-text hover:text-background flex h-10 w-10 items-center justify-center rounded-lg border transition-colors"
               >
                 <Facebook className="h-5 w-5" />
               </a>
               <a
                 href="#"
-                className="border-border hover:bg-primary flex h-10 w-10 items-center justify-center rounded-lg border text-gray-400 transition-colors hover:text-white"
+                className="border-border hover:bg-primary text-text hover:text-background flex h-10 w-10 items-center justify-center rounded-lg border transition-colors"
               >
                 <Twitter className="h-5 w-5" />
               </a>
               <a
                 href="#"
-                className="border-border hover:bg-primary flex h-10 w-10 items-center justify-center rounded-lg border text-gray-400 transition-colors hover:text-white"
+                className="border-border hover:bg-primary text-text hover:text-background flex h-10 w-10 items-center justify-center rounded-lg border transition-colors"
               >
                 <Instagram className="h-5 w-5" />
               </a>
               <a
                 href="#"
-                className="border-border hover:bg-primary flex h-10 w-10 items-center justify-center rounded-lg border text-gray-400 transition-colors hover:text-white"
+                className="border-border hover:bg-primary text-text hover:text-background flex h-10 w-10 items-center justify-center rounded-lg border transition-colors"
               >
                 <Mail className="h-5 w-5" />
               </a>
