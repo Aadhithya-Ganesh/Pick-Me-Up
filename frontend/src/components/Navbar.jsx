@@ -55,7 +55,7 @@ function Navbar() {
           <li>
             <NavLink
               to="/login"
-              className="block cursor-pointer rounded-[48px] bg-transparent px-[15px] py-1 text-[12px] font-bold shadow-xl hover:bg-[rgb(252,248,248)] md:px-6 md:py-2 md:text-sm"
+              className="block cursor-pointer rounded-[48px] bg-transparent px-[15px] py-1 text-[12px] font-bold shadow-xl hover:bg-gray-100 md:px-6 md:py-2 md:text-sm"
             >
               Login
             </NavLink>
@@ -77,7 +77,7 @@ function Navbar() {
           <button
             type="button"
             onClick={handleMenuOpen}
-            className="bg-primary inline-block rounded-2xl p-3"
+            className="bg-primary inline-block cursor-pointer rounded-2xl p-3"
           >
             <User2 color="#ffffff" />
           </button>
