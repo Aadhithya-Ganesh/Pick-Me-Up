@@ -11,6 +11,9 @@ import { action as logoutAction } from "./pages/Logout";
 import DriverPage from "./pages/DriverPage";
 import NavbarRootPage from "./pages/NavbarRootPage";
 import ModeSwitchContextProvider from "./context/ModeSwitchContext";
+import RideDetailsPage from "./pages/RideDetailsPage";
+import BookingPage from "./pages/BookingPage";
+import BookingDetails from "./pages/BookingDetails";
 
 function App() {
   const routes = createBrowserRouter([
@@ -28,6 +31,9 @@ function App() {
             { path: "/dashboard", element: <Dashboard /> },
             { path: "/rides", element: <RiderPage /> },
             { path: "/offer-ride", element: <DriverPage /> },
+            { path: "/rides/:rideId", element: <RideDetailsPage /> },
+            { path: "/book/:rideId", element: <BookingPage /> },
+            { path: "/booking/:bookingId", element: <BookingDetails /> },
           ],
         },
         { path: "login", element: <LoginPage />, action: loginAction },
