@@ -11,6 +11,8 @@ from app.models.schemas import (
     BookingStatus
 )
 from app.services.booking_service import BookingService
+from app.services.lock_service import LockService 
+from app.config import settings  
 from typing import Optional
 import logging
 
@@ -25,33 +27,58 @@ async def create_booking(
     x_user_role: str = Header(..., alias="X-User-Role"),
     db: Session = Depends(get_db)
 ):
-    """
-    Create a new booking
-    """
-    logger.info(f"Creating booking for user {x_user_id}, ride {booking_data.ride_id}")
+    """Create a new booking with distributed locking"""
+    logger.info(f"📝 Creating booking for user {x_user_id}, ride {booking_data.ride_id}")
     
     booking_service = BookingService(db)
+    lock_service = LockService()
     
-    # 1. Check if user already has pending/confirmed booking for this ride
-    if booking_service.check_user_has_pending_booking(x_user_id, booking_data.ride_id):
-        raise HTTPException(
-            status_code=400,
-            detail={
-                "error_code": "DUPLICATE_BOOKING",
-                "message": "You already have a booking for this ride"
-            }
+    lock_value = lock_service.get_lock_value(settings.INSTANCE_ID)
+    lock_acquired = False
+    
+    try:
+        # Acquire distributed lock
+        lock_acquired = lock_service.acquire_lock(booking_data.ride_id, lock_value)
+        
+        if not lock_acquired:
+            raise HTTPException(
+                status_code=409,
+                detail={
+                    "error_code": "BOOKING_IN_PROGRESS",
+                    "message": "Another booking for this ride is in progress. Please try again."
+                }
+            )
+        
+        logger.info(f"🔒 Lock acquired for ride {booking_data.ride_id}")
+        
+        # Check duplicate booking
+        if booking_service.check_user_has_pending_booking(x_user_id, booking_data.ride_id):
+            raise HTTPException(
+                status_code=400,
+                detail={
+                    "error_code": "DUPLICATE_BOOKING",
+                    "message": "You already have a booking for this ride"
+                }
+            )
+        
+        # Create booking
+        booking = booking_service.create_booking(x_user_id, booking_data)
+        
+        logger.info(f"✅ Booking created: {booking.booking_id}")
+        
+        return BookingCreateResponse(
+            success=True,
+            booking_id=booking.booking_id,
+            status=BookingStatus.PENDING,
+            message="Your booking is being processed.",
+            estimated_confirmation_time="30 seconds",
+            created_at=booking.created_at
         )
-    
-    booking = booking_service.create_booking(x_user_id, booking_data)
-    
-    return BookingCreateResponse(
-        success=True,
-        booking_id=booking.booking_id,
-        status=BookingStatus.PENDING,
-        message="Your booking is being processed. You will receive confirmation shortly.",
-        estimated_confirmation_time="30 seconds",
-        created_at=booking.created_at
-    )
+        
+    finally:
+        if lock_acquired:
+            lock_service.release_lock(booking_data.ride_id, lock_value)
+            logger.info(f"🔓 Lock released for ride {booking_data.ride_id}")
 
 @router.get("/{booking_id}/status")
 async def get_booking_status(
@@ -88,7 +115,7 @@ async def get_booking_details(
     db: Session = Depends(get_db)
 ):
     """Get full booking details"""
-    logger.info(f"📖 Getting details for booking {booking_id}")
+    logger.info(f"Getting details for booking {booking_id}")
     
     booking_service = BookingService(db)
     booking = booking_service.get_booking(booking_id)

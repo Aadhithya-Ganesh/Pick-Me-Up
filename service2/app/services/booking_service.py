@@ -23,7 +23,7 @@ class BookingService:
     ) -> Booking:
 
         booking_id = self.generate_booking_id()
-        
+
         booking = Booking(
             booking_id=booking_id,
             user_id=user_id,

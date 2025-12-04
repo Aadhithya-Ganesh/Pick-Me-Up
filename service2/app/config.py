@@ -1,5 +1,4 @@
 from pydantic_settings import BaseSettings
-from typing import Optional
 
 class Settings(BaseSettings):
     # App
@@ -8,7 +7,7 @@ class Settings(BaseSettings):
     DEBUG: bool = True
     
     # Database
-    DATABASE_URL: str = "postgresql://booking_user:password@localhost:5432/booking_db"
+    DATABASE_URL: str
     
     # Redis
     REDIS_HOST: str = "localhost"
@@ -20,17 +19,18 @@ class Settings(BaseSettings):
     RABBITMQ_PORT: int = 5672
     RABBITMQ_USER: str = "guest"
     RABBITMQ_PASSWORD: str = "guest"
+    RABBITMQ_VHOST: str = "/"
     
-    # External Services
-    RIDE_SERVICE_URL: str = "http://localhost:8001"
-    USER_SERVICE_URL: str = "http://localhost:8002"
+    # Services
+    RIDE_SERVICE_URL: str = "http://ride-service:8001"
+    USER_SERVICE_URL: str = "http://user-service:8002"
     
     # JWT
     JWT_SECRET_KEY: str = "your-secret-key-change-this"
     JWT_ALGORITHM: str = "HS256"
     
     # Business Logic
-    LOCK_TIMEOUT: int = 10  # seconds
+    LOCK_TIMEOUT: int = 10
     BOOKING_EXPIRY_MINUTES: int = 5
     CANCELLATION_HOURS_BEFORE: int = 1
     

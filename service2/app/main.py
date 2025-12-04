@@ -1,6 +1,9 @@
 from fastapi import FastAPI
+from contextlib import asynccontextmanager
 from app.config import settings
 from app.core.database import init_db, test_connection, get_db_health
+from app.core.redis_client import test_redis_connection, get_redis_health
+from app.core.rabbitmq import init_rabbitmq, close_rabbitmq, get_rabbitmq_health, get_rabbitmq
 from app.api.v1 import bookings
 import logging
 
@@ -11,21 +14,9 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Create FastAPI app
-app = FastAPI(
-    title=settings.APP_NAME,
-    version="1.0.0",
-    description="Booking Service for Carpooling Application"
-)
-
-app.include_router(bookings.router)
-
-@app.on_event("startup")
-async def startup_event():
-    """Run on application startup"""
-    logger.info(f"Starting {settings.APP_NAME}")
-    logger.info(f"Instance ID: {settings.INSTANCE_ID}")
-    logger.info(f"Debug Mode: {settings.DEBUG}")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Application lifespan events"""
     
     # Test database connection
     logger.info("Testing database connection...")
@@ -36,14 +27,39 @@ async def startup_event():
         logger.error("Failed to connect to database")
         raise Exception("Database connection failed")
     
-    logger.info("=" * 60)
+    # Test Redis connection
+    logger.info("Testing Redis connection...")
+    if test_redis_connection():
+        logger.info("Redis initialization complete")
+    else:
+        logger.warning("Redis connection failed - distributed locking disabled")
+    
+    # Initialize RabbitMQ
+    logger.info("Initializing RabbitMQ connection...")
+    try:
+        await init_rabbitmq()
+        logger.info("RabbitMQ initialization complete")
+    except Exception as e:
+        logger.error(f"RabbitMQ initialization failed: {e}")
+        logger.warning("Continuing without RabbitMQ - async events disabled")
+    
     logger.info("Application startup complete")
-    logger.info("=" * 60)
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    """Run on application shutdown"""
+    
+    yield
+    
     logger.info("Shutting down application...")
+    await close_rabbitmq()
+
+# Create FastAPI app with lifespan
+app = FastAPI(
+    title=settings.APP_NAME,
+    version="1.0.0",
+    description="Booking Service for Carpooling Application",
+    lifespan=lifespan  
+)
+
+# Include routers
+app.include_router(bookings.router)
 
 @app.get("/")
 async def root():
@@ -60,15 +76,24 @@ async def root():
 async def health_check():
     """Health check endpoint - used by load balancer"""
     db_health = get_db_health()
+    redis_health = get_redis_health()
+    rabbitmq_health = get_rabbitmq_health()  
     
-    is_healthy = db_health["status"] == "connected"
+    # Overall health status
+    is_healthy = (
+        db_health["status"] == "connected" and 
+        redis_health["status"] == "connected" and
+        rabbitmq_health["status"] == "connected"  
+    )
     
     return {
         "status": "healthy" if is_healthy else "unhealthy",
         "service": settings.APP_NAME,
         "instance_id": settings.INSTANCE_ID,
         "checks": {
-            "database": db_health["status"]
+            "database": db_health["status"],
+            "redis": redis_health["status"],
+            "rabbitmq": rabbitmq_health["status"]  
         }
     }
 
@@ -76,7 +101,14 @@ async def health_check():
 async def readiness_check():
     """Readiness check - is service ready to accept traffic"""
     db_health = get_db_health()
-    is_ready = db_health["status"] == "connected"
+    redis_health = get_redis_health()
+    rabbitmq_health = get_rabbitmq_health()  
+    
+    is_ready = (
+        db_health["status"] == "connected" and
+        redis_health["status"] == "connected" and
+        rabbitmq_health["status"] == "connected" 
+    )
     
     if is_ready:
         return {
@@ -87,9 +119,42 @@ async def readiness_check():
         return {
             "status": "not_ready",
             "instance_id": settings.INSTANCE_ID,
-            "reason": "Database not connected"
+            "reason": f"Database: {db_health['status']}, Redis: {redis_health['status']}, RabbitMQ: {rabbitmq_health['status']}"
+        }
+
+@app.post("/test/publish-event")
+async def test_publish_event():
+    """Test endpoint to publish a sample event"""
+    try:
+        from app.core.rabbitmq import rabbitmq_client
+        
+        # Sample event
+        test_event = {
+            "event_type": "test.event",
+            "message": "Hello from Booking Service!",
+            "timestamp": "2025-11-15T12:00:00Z",
+            "instance_id": settings.INSTANCE_ID
         }
         
+        # Publish to booking_events exchange
+        await rabbitmq_client.publish_event(
+            exchange_name="booking_events",
+            routing_key="test.event",
+            message=test_event
+        )
+        
+        return {
+            "success": True,
+            "message": "Event published successfully",
+            "event": test_event
+        }
+        
+    except Exception as e:
+        return {
+            "success": False,
+            "error": str(e)
+        }
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(
