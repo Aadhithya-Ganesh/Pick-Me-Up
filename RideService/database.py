@@ -1,8 +1,15 @@
-from pymongo import MongoClient
 import os
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, declarative_base
 
-url = os.getenv('MONGO_URI')
+url = os.getenv("DATABASE_URL")
 
-client = MongoClient(url)
-database = client.ride_share
-collection = database["rides"]
+engine = create_engine(url, echo=True)
+
+Base = declarative_base()
+
+def init_db():
+    import model
+    Base.metadata.create_all(engine)
+
+SessionLocal = sessionmaker(bind=engine)
