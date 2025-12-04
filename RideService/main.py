@@ -1,12 +1,10 @@
 from fastapi import FastAPI
-from database import collection, database
+from database import init_db
 
 app = FastAPI()
 
-@app.get("/healthz")
-def read_root():
-    return {"message": "healthy"}
+init_db()
 
-@app.get("/db")
-def check_db_connection():
-    return collection.find()
+@app.get("/")
+def hello():
+    return {"message" : "hello from order"}
