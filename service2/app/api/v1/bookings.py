@@ -12,6 +12,7 @@ from app.models.schemas import (
 )
 from app.services.booking_service import BookingService
 from app.services.lock_service import LockService 
+from app.services.event_service import EventService
 from app.config import settings  
 from typing import Optional
 import logging
@@ -28,7 +29,7 @@ async def create_booking(
     db: Session = Depends(get_db)
 ):
     """Create a new booking with distributed locking"""
-    logger.info(f"📝 Creating booking for user {x_user_id}, ride {booking_data.ride_id}")
+    logger.info(f"Creating booking for user {x_user_id}, ride {booking_data.ride_id}")
     
     booking_service = BookingService(db)
     lock_service = LockService()
@@ -49,7 +50,7 @@ async def create_booking(
                 }
             )
         
-        logger.info(f"🔒 Lock acquired for ride {booking_data.ride_id}")
+        logger.info(f"Lock acquired for ride {booking_data.ride_id}")
         
         # Check duplicate booking
         if booking_service.check_user_has_pending_booking(x_user_id, booking_data.ride_id):
@@ -64,7 +65,12 @@ async def create_booking(
         # Create booking
         booking = booking_service.create_booking(x_user_id, booking_data)
         
-        logger.info(f"✅ Booking created: {booking.booking_id}")
+        try:
+            await EventService.publish_seat_reserve_requested(booking)
+        except Exception as e:
+            logger.error(f"Failed to publish event (booking still created): {e}")
+
+        logger.info(f"Booking created: {booking.booking_id}")
         
         return BookingCreateResponse(
             success=True,
@@ -78,7 +84,7 @@ async def create_booking(
     finally:
         if lock_acquired:
             lock_service.release_lock(booking_data.ride_id, lock_value)
-            logger.info(f"🔓 Lock released for ride {booking_data.ride_id}")
+            logger.info(f"Lock released for ride {booking_data.ride_id}")
 
 @router.get("/{booking_id}/status")
 async def get_booking_status(
@@ -188,6 +194,11 @@ async def cancel_booking(
         cancellation_reason = cancellation_data.cancellation_reason
     
     cancelled_booking = booking_service.cancel_booking(booking_id, cancellation_reason)
+
+    try:
+        await EventService.publish_booking_cancelled(cancelled_booking, cancelled_by="USER")
+    except Exception as e:
+        logger.error(f"Failed to publish cancellation event: {e}")
 
     return {
         "success": True,
