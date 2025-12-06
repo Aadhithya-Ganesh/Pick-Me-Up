@@ -1,5 +1,4 @@
 import asyncio
-import aio_pika
 from aio_pika import connect_robust, ExchangeType, IncomingMessage
 from app.core.database import SessionLocal
 from app.services.booking_service import BookingService

@@ -1,25 +1,16 @@
-from typing import Annotated, List
+from typing import List
 from fastapi import Depends, APIRouter, HTTPException
 import requests
+from RideService.app.database import get_db
+from RideService.app.models.model import Rides
 from sqlalchemy.orm import Session
-from database import SessionLocal
-from model import Rides
-from schema import RideCreate, RideResponse, RideUpdate
+from RideService.app.models.schema import RideCreate, RideResponse, RideUpdate
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-db_dependency = Annotated[Session, Depends(get_db)]
-
-router = APIRouter(prefix="/rides", tags=["rides"])
+router = APIRouter(prefix="/api/rides", tags=["rides"])
 
 # create a new ride
 @router.post("/", response_model=RideResponse, status_code=201)
-def create_ride(ride: RideCreate, db: db_dependency):
+def create_ride(ride: RideCreate, db: Session = Depends(get_db)):
     user_id = ride.user_id
 
     try:
@@ -37,19 +28,19 @@ def create_ride(ride: RideCreate, db: db_dependency):
 
 # Display the rides of a specific user
 @router.get("/", response_model=List[RideResponse], status_code=200)
-def get_all_rides(user_id: int, db: db_dependency):
+def get_all_rides(user_id: int, db: Session = Depends(get_db)):
     return db.query(Rides).filter(Rides.user_id == user_id).all()
 
 # Get a specific ride by its ID
 @router.get("/{ride_id}", response_model=RideResponse, status_code=200)
-def get_ride(ride_id: int, db: db_dependency):
+def get_ride(ride_id: int, db: Session = Depends(get_db)):
     db_ride = db.query(Rides).filter(Rides.id == ride_id).first()
     if not db_ride:
         raise HTTPException(status_code=404, detail="Ride not found.")
     return db_ride
 
 @router.put("/{ride_id}", response_model=RideResponse, status_code=200)
-def update_ride(ride_id: int, ride_update: RideUpdate, db: db_dependency):
+def update_ride(ride_id: int, ride_update: RideUpdate, db: Session = Depends(get_db)):
     db_ride = db.query(Rides).filter(Rides.id == ride_id).first()
     if not db_ride:
         raise HTTPException(status_code=404, detail="Ride not found.")
@@ -62,7 +53,7 @@ def update_ride(ride_id: int, ride_update: RideUpdate, db: db_dependency):
     return db_ride
 
 @router.delete("/{ride_id}", status_code=204)
-def delete_ride(ride_id: int, db: db_dependency):
+def delete_ride(ride_id: int, db: Session = Depends(get_db)):
     db_ride = db.query(Rides).filter(Rides.id == ride_id).first()
     if not db_ride:
         raise HTTPException(status_code=404, detail="Ride not found.")
