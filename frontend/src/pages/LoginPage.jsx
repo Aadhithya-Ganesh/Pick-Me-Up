@@ -76,8 +76,10 @@ export const action = async ({ request }) => {
     password: data.get("password"),
   };
 
-  localStorage.setItem("token", "token");
-  localStorage.setItem("username", authdata.username);
+  const { token ,userid} = fetch()
+
+  localStorage.setItem("token", token);
+  localStorage.setItem("username", userid);
 
   return redirect("/");
 };
