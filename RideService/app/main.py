@@ -1,8 +1,10 @@
 from fastapi import FastAPI
-from database import init_db, get_db_health
-from RideService.app.controller.rides import router as ridesRouter
+from app.database import init_db, get_db_health
+from app.controller.rides import router as ridesRouter
 import logging
-from RideService.app.rabbitmq.rabbitmq import init_rabbitmq, get_rabbitmq_health
+from app.rabbitmq.rabbitmq import init_rabbitmq, get_rabbitmq_health
+import asyncio
+from app.rabbitmq.consumer import start_consumer
 
 # Configure logging
 logging.basicConfig(
@@ -15,7 +17,14 @@ logger = logging.getLogger(__name__)
 app = FastAPI()
 
 init_db()
-init_rabbitmq()
+
+@app.on_event("startup")
+async def startup_event():
+    await init_rabbitmq()
+    logging.info("RabbitMQ connection initialized")
+
+    asyncio.create_task(start_consumer())
+    logging.info("RabbitMQ consumer task started")
 
 @app.get("/health")
 async def health_check():

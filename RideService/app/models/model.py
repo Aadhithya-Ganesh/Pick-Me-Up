@@ -1,4 +1,3 @@
-from database import Base
 from sqlalchemy import Column, Integer, String, Float, Boolean, Date, Time, Text, ForeignKey
 from sqlalchemy.orm import relationship, declarative_base
 

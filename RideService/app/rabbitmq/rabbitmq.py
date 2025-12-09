@@ -11,7 +11,6 @@ RABBITMQ_USER = os.getenv("RABBITMQ_USER")
 RABBITMQ_PASSWORD = os.getenv("RABBITMQ_PASSWORD")
 RABBITMQ_HOST = os.getenv("RABBITMQ_HOST")
 RABBITMQ_PORT = os.getenv("RABBITMQ_PORT")
-RABBITMQ_VHOST = os.getenv("RABBITMQ_VHOST")
 
 class RabbitMQClient:
     """RabbitMQ client for publishing and consuming events"""
@@ -26,8 +25,7 @@ class RabbitMQClient:
         """Establish connection to RabbitMQ"""
         try:
             rabbitmq_url = (
-                f"amqp://{RABBITMQ_USER}:{RABBITMQ_PASSWORD}"
-                f"@{RABBITMQ_HOST}:{RABBITMQ_PORT}{RABBITMQ_VHOST}"
+                f"amqp://{RABBITMQ_USER}:{RABBITMQ_PASSWORD}@{RABBITMQ_HOST}:{RABBITMQ_PORT}/"
             )
             
             self.connection = await connect_robust(rabbitmq_url)
@@ -116,19 +114,9 @@ async def close_rabbitmq():
     """Close RabbitMQ connection"""
     await rabbitmq_client.disconnect()
 
-async def test_rabbitmq_connection():
-    """Test RabbitMQ connection"""
-    try:
-        await rabbitmq_client.connect()
-        logger.info("RabbitMQ connection test successful")
-        return True
-    except Exception as e:
-        logger.error(f"RabbitMQ connection test failed: {e}")
-        return False
-
 def get_rabbitmq_health():
     """Get RabbitMQ health status"""
     if rabbitmq_client.connection and not rabbitmq_client.connection.is_closed:
-        return {"status": "connected", "host": RABBITMQ_HOST}
+        return {"status": "connected", "host": RABBITMQ_HOST, "port": RABBITMQ_PORT}
     else:
         return {"status": "disconnected"}

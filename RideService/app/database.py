@@ -1,7 +1,7 @@
 import os
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
-from RideService.app.models.model import Base
+from app.models.model import Base
 import logging
 
 logger = logging.getLogger(__name__)
