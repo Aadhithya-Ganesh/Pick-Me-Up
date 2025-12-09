@@ -1,17 +1,96 @@
 services:
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  
+  # redis:
+  #   image: redis:7-alpine
+  #   container_name: booking_redis
+  #   ports:
+  #     - "6379:6379"
+  #   command: redis-server --appendonly yes
+  #   volumes:
+  #     - redis_data:/data
+  #   healthcheck:
+  #     test: ["CMD", "redis-cli", "ping"]
+  #     interval: 10s
+  #     timeout: 3s
+  #     retries: 5
+
   ride-service:
     build: ./RideService
     container_name: ride-service
     ports:
-      - "5000:5000"
-    volumes:
-      - ./RideService:/app
+      - "8081:8081"
     networks:
       - backend
-    depends_on:
-      - database
+      - frontend
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/rides?sslmode=disable
     env_file:
       - .env
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      database:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:8081/health')",
+        ]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+
+  # booking-service:
+  #   build: ./BookingService
+  #   container_name: booking-service
+  #   ports:
+  #     - "8080:8080"
+  #   networks:
+  #     - backend
+  #     - frontend
+  #   environment:
+  #     - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/booking?sslmode=disable
+  #   env_file:
+  #     - .env
+  #   depends_on:
+  #     rabbitmq:
+  #       condition: service_healthy
+  #     database:
+  #       condition: service_healthy
+  #   healthcheck:
+  #     test:
+  #       [
+  #         "CMD",
+  #         "python",
+  #         "-c",
+  #         "import urllib.request; urllib.request.urlopen('http://localhost:8080/health')",
+  #       ]
+  #     interval: 1m30s
+  #     timeout: 30s
+  #     retries: 5
+  #     start_period: 30s
 
   database:
     image: postgres:18-alpine
@@ -22,19 +101,62 @@ services:
       - backend
     volumes:
       - postgres-data:/var/lib/postgresql/data
+      - ./create-db.sql:/docker-entrypoint-initdb.d/01_create_dbs.sql:ro
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d rides"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
-  frontend:
-    build: ./frontend
-    env_file:
-      - .env
+  # frontend:
+  #   build: ./frontend
+  #   env_file:
+  #     - .env
+  #   ports:
+  #     - "80:80"
+  #   networks:
+  #     - frontend
+  #   depends_on:
+  #     ride-service:
+  #       condition: service_healthy
+  #     booking-service:
+  #       condition: service_healthy
+
+  adminer:
+    image: adminer
+    restart: always
     ports:
-      - "80:80"
+      - 9080:8080
     networks:
       - backend
 
+  test-publisher:
+    build:
+      context: ./test
+      dockerfile: Dockerfile.publisher
+    depends_on:
+      - rabbitmq
+    networks:
+      - backend
+    restart: "no"
+
+  test-consumer:
+    build:
+      context: ./test
+      dockerfile: Dockerfile.consumer
+    depends_on:
+      - rabbitmq
+    networks:
+      - backend
+    restart: always
+
+
 networks:
   backend:
+  frontend:
 
 volumes:
   postgres-data:
+  rabbitmq_data:

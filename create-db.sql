@@ -1,0 +1,2 @@
+CREATE DATABASE rides;
+CREATE DATABASE booking;
