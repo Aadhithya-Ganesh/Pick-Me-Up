@@ -1,0 +1,26 @@
+fastapi
+uvicorn
+sqlalchemy
+pydantic
+email-validator
+#JWT
+python-jose[cryptography]
+
+#for temp hashing
+# passlib[argon2]
+passlib[bcrypt]
+
+#DB Drivers
+# sqlite3-binary #optional
+psycopg2-binary #Postgre
+
+#RabbitMQ
+pika
+
+python-multipart
+
+# Environment variables
+python-dotenv
+
+
+
