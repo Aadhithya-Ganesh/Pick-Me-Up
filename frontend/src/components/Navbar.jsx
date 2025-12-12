@@ -3,10 +3,20 @@ import { NavLink, useNavigate, useSubmit } from "react-router-dom";
 import Logo from "./Logo";
 import { Menu, MenuItem } from "@mui/material";
 import { useState } from "react";
+import maleAvatar from "../assets/MaleUser.png";
+import femaleAvatar from "../assets/FemaleUser.png";
+import defaultAvatar from "../assets/User.png";
 
 function Navbar() {
   const token = localStorage.getItem("token");
-  const username = localStorage.getItem("username");
+
+  const username = localStorage.getItem("userName");
+  const gender = localStorage.getItem("gender");
+
+  let AvatarIcon;
+  if (gender === "Male") AvatarIcon = maleAvatar;
+  else if (gender === "Female") AvatarIcon = femaleAvatar;
+  else AvatarIcon = defaultAvatar;
 
   const [anchorEl, setAnchorEl] = useState(null);
   const navigate = useNavigate();
@@ -77,9 +87,13 @@ function Navbar() {
           <button
             type="button"
             onClick={handleMenuOpen}
-            className="bg-primary inline-block cursor-pointer rounded-2xl p-3"
+            className="inline-block cursor-pointer rounded-full p-1"
           >
-            <User2 color="#ffffff" />
+            <img
+              src={AvatarIcon}
+              alt="avatar"
+              className="w-10 h-10 rounded-full object-cover"
+            />
           </button>
 
           <Menu
@@ -102,7 +116,6 @@ function Navbar() {
           >
             {/* User Info Header */}
             <div className="px-4 py-3">
-              <p className="text-sm text-gray-500">Signed in as</p>
               <p className="truncate text-sm font-semibold text-gray-900">
                 {username || "Unknown User"}
               </p>
