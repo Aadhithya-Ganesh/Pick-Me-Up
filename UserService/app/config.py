@@ -1,14 +1,14 @@
 # from datetime import timedelta
-# import os
+import os
 
 # DATABASE
 # For dev: SQLite (file in the user-service folder)
 # DATABASE_URL = os.getenv("DATABASE_URL")
-DB_USER = "postgres"
-DB_PASSWORD = "password"
-DB_HOST = "localhost"        # service name from docker-compose
-DB_NAME = "pickmeup"
-DATABASE_URL = "sqlite:///./users.db"
+# DB_USER = "postgres"
+# DB_PASSWORD = "password"
+# DB_HOST = "localhost"        # service name from docker-compose
+# DB_NAME = "pickmeup"
+DATABASE_URL = os.getenv("DATABASE_URL","sqlite:///./users.db")
 # Later for Postgres (example):
 # DATABASE_URL = "postgresql://user:password@db-host/db-name" or
 
