@@ -1,4 +1,5 @@
 import { Form, Link, redirect } from "react-router-dom";
+import axios from "axios";
 
 function SignupPage() {
   return (
@@ -18,33 +19,45 @@ function SignupPage() {
             <div className="mb-10 grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
                 <label
-                  htmlFor="username"
+                  htmlFor="firstName"
                   className="block text-sm font-semibold tracking-[2px]"
                 >
-                  USERNAME
+                  FIRSTNAME
                 </label>
                 <input
                   type="text"
-                  id="username"
-                  name="username"
+                  id="firstName"
+                  name="firstName"
                   required
                   className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2"
                 />
               </div>
               <div>
-                <label
-                  htmlFor="fullname"
-                  className="block text-sm font-semibold tracking-[2px]"
-                >
-                  PHONE
+                <label htmlFor="lastName" className="block text-sm font-semibold tracking-[2px]">
+                  LAST NAME
                 </label>
                 <input
-                  type="number"
-                  id="phone"
-                  name="phone"
+                  type="text"
+                  id="lastName"
+                  name="lastName"
                   required
                   className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2"
                 />
+              </div>
+              <div>
+                <label htmlFor="gender" className="block text-sm font-semibold tracking-[2px]">
+                  GENDER
+                </label>
+                <select
+                  id="gender"
+                  name="gender"
+                  required
+                  className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2"
+                >
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Not Prefer to Say">Not Prefer to Say</option>
+                </select>
               </div>
               <div>
                 <label
@@ -62,6 +75,21 @@ function SignupPage() {
                 />
               </div>
               <div>
+                <label
+                  htmlFor="phone"
+                  className="block text-sm font-semibold tracking-[2px]"
+                >
+                  PHONE NUMBER
+                </label>
+                <input
+                  type="number"
+                  id="phone"
+                  name="phone"
+                  required
+                  className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2"
+                />
+              </div>
+              <div className="sm:col-span-2">
                 <label
                   htmlFor="password"
                   className="block text-sm font-semibold tracking-[2px]"
@@ -105,7 +133,34 @@ function SignupPage() {
 
 export default SignupPage;
 
+// export const action = async ({ request }) => {
+//   console.log("signup action");
+//   return redirect("/login");
+// };
 export const action = async ({ request }) => {
-  console.log("signup action");
-  return redirect("/login");
+  const form = await request.formData();
+
+  const firstName = form.get("firstName");
+  const lastName = form.get("lastName");
+  const gender = form.get("gender")
+  const email = form.get("email");
+  const phone = form.get("phone");
+  const password = form.get("password");
+
+  const payload = {
+    firstName,
+    lastName,
+    email,
+    gender,
+    phone,
+    password
+  };
+
+  try {
+    await axios.post("http://localhost:8000/auth/register", payload);
+    return redirect("/login?signup=1");
+  } catch (err) {
+    console.error("SIGNUP FAILED:", err.response?.data);
+    return redirect("/signup?error=1");
+  }
 };
