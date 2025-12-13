@@ -10,12 +10,12 @@ class Settings(BaseSettings):
     DATABASE_URL: str
     
     # Redis
-    REDIS_HOST: str = "localhost"
+    REDIS_HOST: str = "redis"
     REDIS_PORT: int = 6379
     REDIS_DB: int = 0
     
     # RabbitMQ
-    RABBITMQ_HOST: str = "localhost"
+    RABBITMQ_HOST: str = "rabbitmq"
     RABBITMQ_PORT: int = 5672
     RABBITMQ_USER: str = "guest"
     RABBITMQ_PASSWORD: str = "guest"

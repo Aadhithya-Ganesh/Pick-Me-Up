@@ -29,15 +29,19 @@ function App() {
           element: <NavbarRootPage />,
           children: [
             { index: true, element: <HomePage /> },
-
-            { path: "/dashboard", element: <Dashboard />,
+            {
+              path: "/dashboard",
+              element: <Dashboard />,
               children: [
-              { index: true, element: <div>No Notifications Yet</div> },
-              { path: "booking", element: <div>Your bookings...</div>  },
-              { path: "rides", element: <div>Your ride history....</div>  },
-              { path: "notifications", element: <div>No Notifications Yet</div> },
-              { path: "profile", element: <ProfilePage /> },
-            ],
+                { index: true, element: <div>No Notifications Yet</div> },
+                { path: "booking", element: <div>Your bookings...</div> },
+                { path: "rides", element: <div>Your ride history....</div> },
+                {
+                  path: "notifications",
+                  element: <div>No Notifications Yet</div>,
+                },
+                { path: "profile", element: <ProfilePage /> },
+              ],
             },
             { path: "/profile", element: <ProfilePage /> },
 

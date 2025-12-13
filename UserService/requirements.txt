@@ -7,8 +7,8 @@ email-validator
 python-jose[cryptography]
 
 #for temp hashing
-# passlib[argon2]
-passlib[bcrypt]
+passlib[argon2]
+# passlib[bcrypt]
 
 #DB Drivers
 # sqlite3-binary #optional

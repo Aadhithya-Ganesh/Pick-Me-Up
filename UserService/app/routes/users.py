@@ -7,7 +7,7 @@ from app import models
 from app.schemas import UserResponse
 from app.rabbitmq import publish_event
 
-router = APIRouter(prefix="/users", tags=["Users"])
+router = APIRouter(prefix="/api/users", tags=["Users"])
 
 # GET current logged-in user
 @router.get("/me",response_model=UserResponse)

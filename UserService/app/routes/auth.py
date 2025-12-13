@@ -9,7 +9,7 @@ from app.security import verify_password,get_password_hash,create_access_token
 from app.config import ACCESS_TOKEN_EXPIRE_MINUTES
 from app.rabbitmq import publish_event
 
-router = APIRouter(prefix="/auth", tags=["Authentication"])
+router = APIRouter(prefix="/api/auth", tags=["Authentication"])
 
 #Reg
 @router.post("/register",response_model=UserResponse)

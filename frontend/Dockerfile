@@ -4,6 +4,9 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 
+ARG VITE_GATEWAY
+ENV VITE_GATEWAY=localhost
+
 COPY . .
 RUN npm run build
 
