@@ -61,6 +61,20 @@ services:
       timeout: 30s
       retries: 5
       start_period: 30s
+  
+  user-service:
+    build: ./UserService
+    container_name: user-service
+    depends_on:
+      database:
+        condition: service_healthy
+    environment:
+      # DATABASE_URL: postgresql://postgres:password@database:5432/pickmeup
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/users
+    ports:
+      - "8000:8000"
+    networks:
+      - backend
 
   # booking-service:
   #   build: ./BookingService

@@ -1,0 +1,36 @@
+1. Check python version - 3.10/3.11
+python --version
+
+2. Install dependencies from your requirements.txt
+pip install -r requirements.txt
+
+3. Then RUN the script inside the project root, not inside 'app'
+Car-Pooling-Webapp , go to -> cd Car-Pooling-App -> cd user-service -> uvicorn app.main:app --reload
+ 
+- To test:
+1. Before running check is users.db exists, if yes, delete and run the script to avoid overlap data.
+2. A localhost link appears follow that.
+3. In URL type '/docs' after the address [localhost:3000/docs]
+4. Go to auth/register -> Try it out:
+{
+  "firstName": "Steve",
+  "lastName": "Hawk",
+  "email": "sh@example.com",
+  "password": "246891"
+}
+Exceute it-> 200OK will come with a new column the 'id' of the customer
+
+5. Now go to auth/login -> try it out:
+{
+  "email": "sh@example.com",
+  "password": "246891"
+}
+Exceute and see a token will be generated! 
+
+6.Copy the access_token -> Go to top right -> Click 'AUTHORIZE' -> In VALUE label-> Paste the token-> OK -> CLOSE
+
+7. Now to GET/users/me -> Try it out:
+Just click Exceute
+it should display the detail of customer 'Steve' automatically! thatsit
+
+ITS WORKING

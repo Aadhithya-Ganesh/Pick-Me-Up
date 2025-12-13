@@ -1,4 +1,5 @@
 import { Form, Link, redirect } from "react-router-dom";
+import axios from "axios";
 
 function LoginPage() {
   return (
@@ -14,15 +15,15 @@ function LoginPage() {
           >
             <div>
               <label
-                htmlFor="username"
+                htmlFor="email"
                 className="block text-[14px] font-semibold tracking-[2px]"
               >
-                USERNAME
+                EMAIL ID
               </label>
               <input
-                type="text"
-                id="username"
-                name="username"
+                type="email"
+                id="email"
+                name="email"
                 required
                 className="mt-2 w-full rounded-2xl border-2 border-gray-200 px-3 py-3"
               />
@@ -69,17 +70,35 @@ function LoginPage() {
 
 export default LoginPage;
 
-export const action = async ({ request }) => {
-  const data = await request.formData();
-  const authdata = {
-    username: data.get("username"),
-    password: data.get("password"),
+export async function action({ request }) {
+  console.log("Login action running...");
+  const form = await request.formData();
+
+  const payload = {
+    email: form.get("email"),       
+    password: form.get("password"),
   };
 
-  const { token ,userid} = fetch()
+  try {
+    const res = await axios.post("http://localhost:8000/auth/login", payload);
 
-  localStorage.setItem("token", token);
-  localStorage.setItem("username", userid);
+    const token = res.data.access_token;
+    
+    localStorage.setItem("token", token);
+    localStorage.setItem("email", payload.email);
 
-  return redirect("/");
-};
+        // Fetch user details with /users/me
+    const me = await axios.get("http://localhost:8000/users/me", {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    const fullName = me.data.firstName + " " + me.data.lastName;
+    localStorage.setItem("userName", fullName);
+    localStorage.setItem("gender", me.data.gender);
+
+    return redirect("/");
+  } catch (err) {
+    console.error("LOGIN_FAILED:", err.response?.data || err.message);
+    return redirect("/login?error=1");
+  }
+}

@@ -14,6 +14,7 @@ import ModeSwitchContextProvider from "./context/ModeSwitchContext";
 import RideDetailsPage from "./pages/RideDetailsPage";
 import BookingPage from "./pages/BookingPage";
 import BookingDetails from "./pages/BookingDetails";
+import ProfilePage from "./pages/ProfilePage";
 
 function App() {
   const routes = createBrowserRouter([
@@ -28,7 +29,18 @@ function App() {
           element: <NavbarRootPage />,
           children: [
             { index: true, element: <HomePage /> },
-            { path: "/dashboard", element: <Dashboard /> },
+
+            { path: "/dashboard", element: <Dashboard />,
+              children: [
+              { index: true, element: <div>No Notifications Yet</div> },
+              { path: "booking", element: <div>Your bookings...</div>  },
+              { path: "rides", element: <div>Your ride history....</div>  },
+              { path: "notifications", element: <div>No Notifications Yet</div> },
+              { path: "profile", element: <ProfilePage /> },
+            ],
+            },
+            { path: "/profile", element: <ProfilePage /> },
+
             { path: "/rides", element: <RiderPage /> },
             { path: "/offer-ride", element: <DriverPage /> },
             { path: "/rides/:rideId", element: <RideDetailsPage /> },
