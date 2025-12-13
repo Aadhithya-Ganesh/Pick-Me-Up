@@ -12,7 +12,7 @@ export default function ProfilePage() {
   useEffect(() => {
     if (!token) return;
 
-    axios.get("http://localhost:8000/users/me", {
+    axios.get(`http://${import.meta.env.VITE_GATEWAY}/api/users/me`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -71,10 +71,6 @@ export default function ProfilePage() {
         <p><strong>Gender:</strong> {user.gender}</p>
         <p><strong>Phone:</strong> {user.phone}</p>
       </div>
-
-
-
-
     </div>
   </div>
 );

@@ -10,7 +10,7 @@ import defaultAvatar from "../assets/User.png";
 function Navbar() {
   const token = localStorage.getItem("token");
 
-  const username = localStorage.getItem("userName");
+  const username = localStorage.getItem("username");
   const gender = localStorage.getItem("gender");
 
   let AvatarIcon;
