@@ -8,7 +8,7 @@ class Rides(Base):
 
     id = Column(Integer, primary_key=True)
 
-    user_id = Column(Integer, nullable=False)
+    user_id = Column(String, nullable=False)
 
     origin = Column(String, nullable=False)
     destination = Column(String, nullable=False)
@@ -38,10 +38,10 @@ class PendingRequest(Base):
     id = Column(Integer, primary_key=True, index=True)
 
     ride_id = Column(Integer, ForeignKey("rides.id"), nullable=False)
-    user_id = Column(Integer, nullable=False)
+    user_id = Column(String, nullable=False)
     seats = Column(Integer, nullable=False)
 
-    booking_id = Column(Integer, nullable=False)
+    booking_id = Column(String, nullable=False)
 
     pickup_location = Column(String, nullable=False)
     dropoff_location = Column(String, nullable=False)
