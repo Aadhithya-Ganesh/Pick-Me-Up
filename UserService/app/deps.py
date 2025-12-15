@@ -40,16 +40,3 @@ def get_current_user(credentials = Depends(oauth2_scheme), db: Session = Depends
         )
 
     return user
-
-# from fastapi.security import OAuth2PasswordBearer
-# from app.schemas import TokenData
-
-# oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
-
-# def get_current_user(token: str = Depends(oauth2_scheme),
-#                      db: Session = Depends(get_db)):
-    
-#     credentials_exception = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
-#                                           detail="Could not validate auth token!.",
-#                                           headers={"WWW-Authenticate":"Bearer"},
-#     )
