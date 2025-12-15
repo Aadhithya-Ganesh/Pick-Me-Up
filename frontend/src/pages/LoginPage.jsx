@@ -1,6 +1,12 @@
 import { Form, Link, redirect } from "react-router-dom";
 import axios from "axios";
 
+{new URLSearchParams(location.search).get("error") && (
+  <p className="text-red-600 text-center font-semibold mt-2">
+    Invalid email or password
+  </p>
+)}
+
 function LoginPage() {
   return (
     <main className="flex h-screen w-full flex-col lg:flex-row">
@@ -25,6 +31,8 @@ function LoginPage() {
                 id="email"
                 name="email"
                 required
+                pattern="^[^\s@]+@[^\s@]+\.com$"
+                title="Enter a valid email, example: user@example.com"
                 className="mt-2 w-full rounded-2xl border-2 border-gray-200 px-3 py-3"
               />
             </div>
@@ -41,6 +49,8 @@ function LoginPage() {
                 id="password"
                 name="password"
                 required
+                pattern="^(?=.*[A-Z])(?=.*[0-9])(?=.*[@$!%*?&]).{8,}$"
+                title="Password must be at least 8 characters, include 1 uppercase letter, 1 number, and 1 special character"
                 className="mt-2 w-full rounded-2xl border-2 border-gray-200 px-3 py-3"
               />
             </div>
@@ -80,7 +90,8 @@ export async function action({ request }) {
   };
 
   try {
-    const res = await axios.post(`http://${import.meta.env.VITE_GATEWAY}/api/auth/login`, payload);
+    // const res = await axios.post(`http://${import.meta.env.VITE_GATEWAY}/api/auth/login`, payload);
+    const res = await axios.post(`http://localhost:8082/api/auth/login`, payload);
 
     const token = res.data.access_token;
     
@@ -88,15 +99,16 @@ export async function action({ request }) {
     localStorage.setItem("email", payload.email);
 
         // Fetch user details with /users/me
-    const me = await axios.get(`http://${import.meta.env.VITE_GATEWAY}/api/users/me`, {
+    // const me = await axios.get(`http://${import.meta.env.VITE_GATEWAY}/api/users/me`, {
+    const me = await axios.get(`http://localhost:8082/api/users/me`, {
       headers: { Authorization: `Bearer ${token}` }
     });
-
-    console.log("User details:", me.data);
 
     const fullName = me.data.firstName + " " + me.data.lastName;
     localStorage.setItem("username", fullName);
     localStorage.setItem("gender", me.data.gender);
+
+    localStorage.setItem("userId", me.data.id);
 
     return redirect("/");
   } catch (err) {

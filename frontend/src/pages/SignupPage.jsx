@@ -29,6 +29,8 @@ function SignupPage() {
                   id="firstName"
                   name="firstName"
                   required
+                  pattern="^[A-Za-z]{2,20}$"
+                  title = "First Name should contain letters"
                   className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2"
                 />
               </div>
@@ -41,6 +43,8 @@ function SignupPage() {
                   id="lastName"
                   name="lastName"
                   required
+                  pattern="^[A-Za-z]{2,20}$"
+                  title = "Last Name should contain letters"
                   className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2"
                 />
               </div>
@@ -71,6 +75,8 @@ function SignupPage() {
                   id="email"
                   name="email"
                   required
+                  pattern="^[^\s@]+@[^\s@]+\.com$"
+                  title="Enter a valid email, example: user@example.com"
                   className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2"
                 />
               </div>
@@ -86,6 +92,8 @@ function SignupPage() {
                   id="phone"
                   name="phone"
                   required
+                  pattern="^[0-9]{10}$"
+                  title="Phone number must be 10 digits"
                   className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2"
                 />
               </div>
@@ -101,6 +109,8 @@ function SignupPage() {
                   id="password"
                   name="password"
                   required
+                  pattern="^(?=.*[A-Z])(?=.*[0-9])(?=.*[@$!%*?&]).{8,}$"
+                  title="Password must be at least 8 characters, include 1 uppercase letter, 1 number, and 1 special character"
                   className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2"
                 />
               </div>
@@ -133,10 +143,6 @@ function SignupPage() {
 
 export default SignupPage;
 
-// export const action = async ({ request }) => {
-//   console.log("signup action");
-//   return redirect("/login");
-// };
 export const action = async ({ request }) => {
   const form = await request.formData();
 
@@ -157,7 +163,8 @@ export const action = async ({ request }) => {
   };
 
   try {
-    await axios.post(`http://${import.meta.env.VITE_GATEWAY}/api/auth/register`, payload);
+    // await axios.post(`http://${import.meta.env.VITE_GATEWAY}/api/auth/register`, payload);
+    await axios.post(`http://localhost:8082/api/auth/register`, payload);
     return redirect("/login?signup=1");
   } catch (err) {
     console.error("SIGNUP FAILED:", err.response?.data);
