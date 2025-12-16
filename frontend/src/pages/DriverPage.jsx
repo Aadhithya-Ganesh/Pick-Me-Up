@@ -1,7 +1,13 @@
 import React, { useState } from 'react';
+import RideDetailsForm from '../components/RideDetailsForm';
+import VehicleInfoForm from '../components/VehicleInfoForm';
 
 function DriverPage() {
-  const [formData, setFormData] = useState({
+  // Track which step we're on
+  const [currentStep, setCurrentStep] = useState(1);
+
+  // Store all form data in one place
+  const [rideData, setRideData] = useState({
     origin: '',
     destination: '',
     departureDate: '',
@@ -11,16 +17,48 @@ function DriverPage() {
     pricePerSeat: 15
   });
 
-  const handleInputChange = (e) => {
+  const [vehicleData, setVehicleData] = useState({
+    carMake: '',
+    carModel: '',
+    licensePlate: ''
+  });
+
+  // Additional settings for step 3
+  const [instantBooking, setInstantBooking] = useState(true);
+  const [agreeToTerms, setAgreeToTerms] = useState(false);
+
+  // Handle ride details form input changes
+  const handleRideInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setRideData(prev => ({
       ...prev,
       [name]: value
     }));
   };
 
+  // Handle vehicle form input changes
+  const handleVehicleInputChange = (e) => {
+    const { name, value } = e.target;
+    setVehicleData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  // Navigate to next step
   const handleNext = () => {
-    console.log('Form data:', formData);
+    if (currentStep < 3) {
+      setCurrentStep(currentStep + 1);
+      console.log('Moving to step:', currentStep + 1);
+    }
+  };
+
+  // Navigate to previous step
+  const handleBack = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+      console.log('Moving back to step:', currentStep - 1);
+    }
   };
 
   return (
@@ -38,231 +76,199 @@ function DriverPage() {
 
         {/* Progress Stepper */}
         <div className="flex items-center justify-center mb-12">
-          {/* Step 1 - Active */}
+          {/* Step 1 */}
           <div className="flex flex-col items-center">
-            <div className="w-14 h-14 rounded-full bg-blue-500 text-white flex items-center justify-center text-xl font-semibold mb-2">
-              1
+            <div className={`w-14 h-14 rounded-full flex items-center justify-center text-xl font-semibold mb-2 ${
+              currentStep > 1 
+                ? 'bg-blue-500 text-white' 
+                : currentStep === 1 
+                ? 'bg-blue-500 text-white' 
+                : 'border-2 border-gray-300 text-gray-400'
+            }`}>
+              {currentStep > 1 ? (
+                <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="3">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              ) : (
+                '1'
+              )}
             </div>
-            <span className="text-sm font-medium text-gray-900">Ride Details</span>
+            <span className={`text-sm font-medium ${currentStep >= 1 ? 'text-gray-900' : 'text-gray-500'}`}>
+              Ride Details
+            </span>
           </div>
 
-          {/* Connector Line */}
-          <div className="w-32 h-0.5 bg-gray-300 mx-4 mt-[-24px]"></div>
+          {/* Connector Line 1 */}
+          <div className={`w-32 h-0.5 mx-4 mt-[-24px] ${currentStep > 1 ? 'bg-blue-500' : 'bg-gray-300'}`}></div>
 
-          {/* Step 2 - Inactive */}
+          {/* Step 2 */}
           <div className="flex flex-col items-center">
-            <div className="w-14 h-14 rounded-full border-2 border-gray-300 text-gray-400 flex items-center justify-center text-xl font-semibold mb-2">
-              2
+            <div className={`w-14 h-14 rounded-full flex items-center justify-center text-xl font-semibold mb-2 ${
+              currentStep > 2 
+                ? 'bg-blue-500 text-white' 
+                : currentStep === 2 
+                ? 'bg-blue-500 text-white' 
+                : 'border-2 border-gray-300 text-gray-400'
+            }`}>
+              {currentStep > 2 ? (
+                <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="3">
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              ) : (
+                '2'
+              )}
             </div>
-            <span className="text-sm font-medium text-gray-500">Vehicle Info</span>
+            <span className={`text-sm font-medium ${currentStep >= 2 ? 'text-gray-900' : 'text-gray-500'}`}>
+              Vehicle Info
+            </span>
           </div>
 
-          {/* Connector Line */}
-          <div className="w-32 h-0.5 bg-gray-300 mx-4 mt-[-24px]"></div>
+          {/* Connector Line 2 */}
+          <div className={`w-32 h-0.5 mx-4 mt-[-24px] ${currentStep > 2 ? 'bg-blue-500' : 'bg-gray-300'}`}></div>
 
-          {/* Step 3 - Inactive */}
+          {/* Step 3 */}
           <div className="flex flex-col items-center">
-            <div className="w-14 h-14 rounded-full border-2 border-gray-300 text-gray-400 flex items-center justify-center text-xl font-semibold mb-2">
+            <div className={`w-14 h-14 rounded-full flex items-center justify-center text-xl font-semibold mb-2 ${
+              currentStep === 3 
+                ? 'bg-blue-500 text-white' 
+                : 'border-2 border-gray-300 text-gray-400'
+            }`}>
               3
             </div>
-            <span className="text-sm font-medium text-gray-500">Review & Publish</span>
+            <span className={`text-sm font-medium ${currentStep === 3 ? 'text-gray-900' : 'text-gray-500'}`}>
+              Review & Publish
+            </span>
           </div>
         </div>
 
-        {/* Form Card */}
-        <div className="bg-white rounded-2xl shadow-sm p-8 md:p-12">
-          <div className="mb-8">
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">
-              Ride Details
-            </h2>
-            <p className="text-gray-600">
-              Enter the basic details of your ride
-            </p>
-          </div>
+        {/* Render the appropriate form based on current step */}
+        {currentStep === 1 && (
+          <RideDetailsForm 
+            formData={rideData}
+            onInputChange={handleRideInputChange}
+            onNext={handleNext}
+          />
+        )}
 
-          <form className="space-y-6">
-            {/* Origin Location */}
-            <div>
-              <label className="block text-base font-semibold text-gray-900 mb-2">
-                Origin Location
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                </div>
-                <input
-                  type="text"
-                  name="origin"
-                  value={formData.origin}
-                  onChange={handleInputChange}
-                  placeholder="Where are you starting from?"
-                  className="w-full pl-12 pr-4 py-4 border border-gray-300 rounded-xl text-base text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-            </div>
+        {currentStep === 2 && (
+          <VehicleInfoForm 
+            vehicleData={vehicleData}
+            onInputChange={handleVehicleInputChange}
+            onBack={handleBack}
+            onNext={handleNext}
+          />
+        )}
 
-            {/* Destination Location */}
-            <div>
-              <label className="block text-base font-semibold text-gray-900 mb-2">
-                Destination Location
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                </div>
-                <input
-                  type="text"
-                  name="destination"
-                  value={formData.destination}
-                  onChange={handleInputChange}
-                  placeholder="Where are you going?"
-                  className="w-full pl-12 pr-4 py-4 border border-gray-300 rounded-xl text-base text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-            </div>
-
-            {/* Departure Date and Time */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Departure Date */}
-              <div>
-                <label className="block text-base font-semibold text-gray-900 mb-2">
-                  Departure Date
-                </label>
-                <input
-                  type="text"
-                  name="departureDate"
-                  value={formData.departureDate}
-                  onChange={handleInputChange}
-                  placeholder="dd/mm/yyyy"
-                  onFocus={(e) => e.target.type = 'date'}
-                  onBlur={(e) => { if (!e.target.value) e.target.type = 'text' }}
-                  className="w-full px-4 py-4 border border-gray-300 rounded-xl text-base text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-
-              {/* Departure Time */}
-              <div>
-                <label className="block text-base font-semibold text-gray-900 mb-2">
-                  Departure Time
-                </label>
-                <input
-                  type="time"
-                  name="departureTime"
-                  value={formData.departureTime}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-4 border border-gray-300 rounded-xl text-base text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-            </div>
-
-            {/* Estimated Duration */}
-            <div>
-              <label className="block text-base font-semibold text-gray-900 mb-2">
-                Estimated Duration
-              </label>
-              <div className="relative">
-                <select
-                  name="duration"
-                  value={formData.duration}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-4 pr-12 border border-gray-300 rounded-xl text-base text-gray-900 appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value="">e.g., 2 hours 30 minutes</option>
-                  <option value="30 minutes">30 minutes</option>
-                  <option value="1 hour">1 hour</option>
-                  <option value="1 hour 30 minutes">1 hour 30 minutes</option>
-                  <option value="2 hours">2 hours</option>
-                  <option value="2 hours 30 minutes">2 hours 30 minutes</option>
-                  <option value="3 hours">3 hours</option>
-                  <option value="3 hours 30 minutes">3 hours 30 minutes</option>
-                  <option value="4 hours">4 hours</option>
-                  <option value="4 hours 30 minutes">4 hours 30 minutes</option>
-                  <option value="5 hours">5 hours</option>
-                  <option value="5 hours 30 minutes">5 hours 30 minutes</option>
-                  <option value="6 hours">6 hours</option>
-                </select>
-                <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
-                  <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </div>
-              </div>
-              <p className="mt-2 text-sm text-gray-500">
-                How long will the journey take?
+        {currentStep === 3 && (
+          <div className="bg-white rounded-2xl shadow-sm p-8 md:p-12">
+            <div className="mb-8">
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                Review & Publish
+              </h2>
+              <p className="text-gray-600">
+                Review your ride details before publishing
               </p>
             </div>
-
-            {/* Available Seats and Price */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Available Seats */}
-              <div>
-                <label className="block text-base font-semibold text-gray-900 mb-2">
-                  Available Seats
-                </label>
-                <div className="relative">
-                  <select
-                    name="availableSeats"
-                    value={formData.availableSeats}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-4 border border-gray-300 rounded-xl text-base text-gray-900 appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="">Select seats</option>
-                    <option value="1">1 seat</option>
-                    <option value="2">2 seats</option>
-                    <option value="3">3 seats</option>
-                    <option value="4">4 seats</option>
-                  </select>
-                  <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
-                    <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-
-              {/* Price per Seat */}
-              <div>
-                <label className="block text-base font-semibold text-gray-900 mb-2">
-                  Price per Seat
-                </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <span className="text-gray-500 text-base">€</span>
-                  </div>
-                  <input
-                    type="number"
-                    name="pricePerSeat"
-                    value={formData.pricePerSeat}
-                    onChange={handleInputChange}
-                    min="5"
-                    max="100"
-                    className="w-full pl-10 pr-4 py-4 border border-gray-300 rounded-xl text-base text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-                <p className="mt-2 text-sm text-gray-500">
-                  €5 - €100
-                </p>
+            
+            {/* Ride Information Section */}
+            <div className="mb-8">
+              <h3 className="text-xl font-bold text-gray-900 mb-4">Ride Information</h3>
+              <div className="space-y-2 text-base">
+                <p><span className="font-bold">From:</span> {rideData.origin || 'Not specified'}</p>
+                <p><span className="font-bold">To:</span> {rideData.destination || 'Not specified'}</p>
+                <p><span className="font-bold">Date:</span> {rideData.departureDate || 'Not specified'}</p>
+                <p><span className="font-bold">Time:</span> {rideData.departureTime || 'Not specified'}</p>
+                <p><span className="font-bold">Duration:</span> {rideData.duration || 'Not specified'}</p>
+                <p><span className="font-bold">Seats:</span> {rideData.availableSeats || 'Not specified'}</p>
+                <p><span className="font-bold">Price:</span> €{rideData.pricePerSeat}</p>
               </div>
             </div>
 
-            {/* Next Button */}
-            <div className="flex justify-end pt-6">
+            {/* Divider */}
+            <div className="border-t border-gray-300 my-8"></div>
+            
+            {/* Vehicle Information Section */}
+            <div className="mb-8">
+              <h3 className="text-xl font-bold text-gray-900 mb-4">Vehicle Information</h3>
+              <div className="space-y-2 text-base">
+                <p><span className="font-bold">Make:</span> {vehicleData.carMake || 'Not specified'}</p>
+                <p><span className="font-bold">Model:</span> {vehicleData.carModel || 'Not specified'}</p>
+                <p><span className="font-bold">License:</span> {vehicleData.licensePlate || 'Not specified'}</p>
+              </div>
+            </div>
+
+            {/* Divider */}
+            <div className="border-t border-gray-300 my-8"></div>
+
+            {/* Instant Booking Toggle */}
+            <div className="mb-6">
+              <div className="flex items-center justify-between p-6 border border-gray-300 rounded-xl">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <h3 className="text-lg font-bold text-gray-900">Instant Booking</h3>
+                    <button className="text-gray-400 hover:text-gray-600">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </button>
+                  </div>
+                  <p className="text-gray-600">Allow instant booking without approval</p>
+                </div>
+                <button
+                  onClick={() => setInstantBooking(!instantBooking)}
+                  className={`relative inline-flex h-8 w-16 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                    instantBooking ? 'bg-blue-500' : 'bg-gray-300'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${
+                      instantBooking ? 'translate-x-9' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
+              </div>
+            </div>
+
+            {/* Terms and Conditions Checkbox */}
+            <div className="mb-8">
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={agreeToTerms}
+                  onChange={(e) => setAgreeToTerms(e.target.checked)}
+                  className="w-6 h-6 text-blue-500 border-gray-300 rounded focus:ring-blue-500 focus:ring-2 cursor-pointer"
+                />
+                <span className="text-base text-gray-900">
+                  I agree to the terms and conditions and privacy policy
+                </span>
+              </label>
+            </div>
+
+            {/* Navigation buttons */}
+            <div className="flex justify-between items-center pt-6">
               <button
                 type="button"
-                onClick={handleNext}
-                className="px-8 py-3 bg-blue-500 text-white text-base font-semibold rounded-xl hover:bg-blue-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                onClick={handleBack}
+                className="px-8 py-3 bg-gray-200 text-gray-700 text-base font-semibold rounded-xl hover:bg-gray-300 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2"
               >
-                Next
+                Back
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (!agreeToTerms) {
+                    alert('Please agree to the terms and conditions');
+                    return;
+                  }
+                  console.log('Publishing ride...', { rideData, vehicleData, instantBooking });
+                }}
+                className="px-8 py-3 bg-green-500 text-white text-base font-semibold rounded-xl hover:bg-green-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+              >
+                Publish Ride
               </button>
             </div>
-          </form>
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );
