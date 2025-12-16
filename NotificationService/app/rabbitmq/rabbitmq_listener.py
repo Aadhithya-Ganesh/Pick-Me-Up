@@ -15,7 +15,7 @@ async def handle_message(message: IncomingMessage):
         event_type = payload.get("event_type")
         data = payload.get("data")
 
-        print(f"📩 Received event: {event_type}")
+        print(f" Received event: {event_type}")
 
         db = SessionLocal()
         try:
@@ -25,7 +25,7 @@ async def handle_message(message: IncomingMessage):
                     type=event_type,
                     message="Your ride has been published successfully"
                 ))
-            if event_type == "booking.created":
+            elif event_type == "booking.created":
                 db.add(Notification(
                     user_id=data["user_id"],
                     type=event_type,
@@ -78,7 +78,12 @@ async def start_consumer():
             # )
 
             # await queue.consume(handle_message)
-            exchange = await channel.declare_exchange(
+            ride_exchange = await channel.declare_exchange(
+                name="ride_events",
+                type=ExchangeType.TOPIC,
+                durable=True
+            )
+            book_exchange = await channel.declare_exchange(
                 name="booking_events",
                 type=ExchangeType.TOPIC,
                 durable=True
@@ -89,8 +94,8 @@ async def start_consumer():
                 durable=True
             )
 
-            await queue.bind(exchange, routing_key="booking.*")
-            # await queue.bind(exchange, routing_key="ride.*")
+            await queue.bind(book_exchange, routing_key="booking.*")
+            await queue.bind(ride_exchange, routing_key="ride.*")
 
             await queue.consume(handle_message)
 
