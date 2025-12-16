@@ -90,8 +90,8 @@ export async function action({ request }) {
   };
 
   try {
-    // const res = await axios.post(`http://${import.meta.env.VITE_GATEWAY}/api/auth/login`, payload);
-    const res = await axios.post(`http://localhost:8082/api/auth/login`, payload);
+    const res = await axios.post(`http://${import.meta.env.VITE_GATEWAY}/api/auth/login`, payload);
+    // const res = await axios.post(`http://localhost:8082/api/auth/login`, payload);
 
     const token = res.data.access_token;
     
@@ -99,8 +99,8 @@ export async function action({ request }) {
     localStorage.setItem("email", payload.email);
 
         // Fetch user details with /users/me
-    // const me = await axios.get(`http://${import.meta.env.VITE_GATEWAY}/api/users/me`, {
-    const me = await axios.get(`http://localhost:8082/api/users/me`, {
+    const me = await axios.get(`http://${import.meta.env.VITE_GATEWAY}/api/users/me`, {
+    // const me = await axios.get(`http://localhost:8082/api/users/me`, {
       headers: { Authorization: `Bearer ${token}` }
     });
 

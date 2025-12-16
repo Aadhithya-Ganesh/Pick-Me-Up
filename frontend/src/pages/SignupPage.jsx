@@ -163,8 +163,8 @@ export const action = async ({ request }) => {
   };
 
   try {
-    // await axios.post(`http://${import.meta.env.VITE_GATEWAY}/api/auth/register`, payload);
-    await axios.post(`http://localhost:8082/api/auth/register`, payload);
+    await axios.post(`http://${import.meta.env.VITE_GATEWAY}/api/auth/register`, payload);
+    // await axios.post(`http://localhost:8082/api/auth/register`, payload);
     return redirect("/login?signup=1");
   } catch (err) {
     console.error("SIGNUP FAILED:", err.response?.data);

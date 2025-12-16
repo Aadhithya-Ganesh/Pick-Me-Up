@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import RideDetailsForm from '../components/RideDetailsForm';
 import VehicleInfoForm from '../components/VehicleInfoForm';
+import { rideApi } from '../api';
 
 function DriverPage() {
-  // Track which step we're on
   const [currentStep, setCurrentStep] = useState(1);
 
-  // Store all form data in one place
   const [rideData, setRideData] = useState({
     origin: '',
     destination: '',
@@ -23,7 +22,6 @@ function DriverPage() {
     licensePlate: ''
   });
 
-  // Additional settings for step 3
   const [instantBooking, setInstantBooking] = useState(true);
   const [agreeToTerms, setAgreeToTerms] = useState(false);
 
@@ -61,6 +59,52 @@ function DriverPage() {
     }
   };
 
+  // Handle publish ride - create payload and send to API
+  const handlePublishRide = async () => {
+    if (!agreeToTerms) {
+      alert('Please agree to the terms and conditions');
+      return;
+    }
+
+    const payload = {
+      user_id: "user123", // get from auth context/localStorage
+      origin: rideData.origin,
+      destination: rideData.destination,
+      date: rideData.departureDate,
+      time: rideData.departureTime,
+      duration: rideData.duration,
+      seats: parseInt(rideData.availableSeats), 
+      price: parseFloat(rideData.pricePerSeat), 
+      car_make: vehicleData.carMake,
+      car_color: vehicleData.carModel, 
+      license_plate: vehicleData.licensePlate,
+      notes: null,
+      instant_booking: instantBooking
+    };
+
+    console.log(JSON.stringify(payload, null, 2));
+
+    // // Send to API
+    // try {
+    //   console.log('Sending request to API...');
+    //   const response = await rideApi.
+      
+    //   console.log(JSON.stringify(response, null, 2));
+      
+    // } catch (error) {
+    //   console.error('API ERROR:');
+    //   console.error(error);
+      
+    //   if (error.response) {
+    //     alert(`Failed to publish ride: ${error.response.data.detail || 'Server error'}`);
+    //   } else if (error.request) {
+    //     alert('Failed to publish ride: No response from server. Please check your connection.');
+    //   } else {
+    //     alert('Failed to publish ride: ' + error.message);
+    //   }
+    // }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="max-w-4xl mx-auto">
@@ -74,7 +118,6 @@ function DriverPage() {
           </p>
         </div>
 
-        {/* Progress Stepper */}
         <div className="flex items-center justify-center mb-12">
           {/* Step 1 */}
           <div className="flex flex-col items-center">
@@ -141,7 +184,6 @@ function DriverPage() {
           </div>
         </div>
 
-        {/* Render the appropriate form based on current step */}
         {currentStep === 1 && (
           <RideDetailsForm 
             formData={rideData}
@@ -192,7 +234,7 @@ function DriverPage() {
               <h3 className="text-xl font-bold text-gray-900 mb-4">Vehicle Information</h3>
               <div className="space-y-2 text-base">
                 <p><span className="font-bold">Make:</span> {vehicleData.carMake || 'Not specified'}</p>
-                <p><span className="font-bold">Model:</span> {vehicleData.carModel || 'Not specified'}</p>
+                <p><span className="font-bold">Color:</span> {vehicleData.carModel || 'Not specified'}</p>
                 <p><span className="font-bold">License:</span> {vehicleData.licensePlate || 'Not specified'}</p>
               </div>
             </div>
@@ -255,13 +297,7 @@ function DriverPage() {
               </button>
               <button
                 type="button"
-                onClick={() => {
-                  if (!agreeToTerms) {
-                    alert('Please agree to the terms and conditions');
-                    return;
-                  }
-                  console.log('Publishing ride...', { rideData, vehicleData, instantBooking });
-                }}
+                onClick={handlePublishRide}
                 className="px-8 py-3 bg-green-500 text-white text-base font-semibold rounded-xl hover:bg-green-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
               >
                 Publish Ride
