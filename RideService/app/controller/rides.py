@@ -28,7 +28,7 @@ def create_ride(ride: RideCreate, db: Session = Depends(get_db)):
 
 
 @router.get("/", response_model=List[RideResponse])
-def get_all_rides(user_id: int, db: Session = Depends(get_db)):
+def get_all_rides(user_id: str, db: Session = Depends(get_db)):
     return RideService.get_rides_by_user(db, user_id)
 
 @router.get("/{ride_id}", response_model=RideResponse)
