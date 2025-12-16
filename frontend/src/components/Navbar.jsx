@@ -2,7 +2,7 @@ import { User2, LogOut } from "lucide-react";
 import { NavLink, useNavigate, useSubmit } from "react-router-dom";
 import Logo from "./Logo";
 import { Menu, MenuItem } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import maleAvatar from "../assets/MaleUser.png";
 import femaleAvatar from "../assets/FemaleUser.png";
 import defaultAvatar from "../assets/User.png";
@@ -10,17 +10,28 @@ import defaultAvatar from "../assets/User.png";
 function Navbar() {
   const token = localStorage.getItem("token");
 
-  const username = localStorage.getItem("username");
-  const gender = localStorage.getItem("gender");
+  const [username, setUsername] = useState(localStorage.getItem("userName"));
+  const [gender, setGender] = useState(localStorage.getItem("gender"));
+
+  const [anchorEl, setAnchorEl] = useState(null);
+  const navigate = useNavigate();
+  const submit = useSubmit();
+
+    // 🔄 Sync when profile updates
+  useEffect(() => {
+    const syncUser = () => {
+      setUsername(localStorage.getItem("userName"));
+      setGender(localStorage.getItem("gender"));
+    };
+
+    window.addEventListener("storage", syncUser);
+    return () => window.removeEventListener("storage", syncUser);
+  }, []);
 
   let AvatarIcon;
   if (gender === "Male") AvatarIcon = maleAvatar;
   else if (gender === "Female") AvatarIcon = femaleAvatar;
   else AvatarIcon = defaultAvatar;
-
-  const [anchorEl, setAnchorEl] = useState(null);
-  const navigate = useNavigate();
-  const submit = useSubmit();
 
   const handleMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -31,7 +42,6 @@ function Navbar() {
   };
 
   const handleLogoutClick = () => {
-    // Trigger React Router action on /logout
     submit(null, { method: "post", action: "/logout" });
   };
 

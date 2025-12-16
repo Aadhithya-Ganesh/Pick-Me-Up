@@ -1,5 +1,6 @@
 from pydantic import BaseModel
-from datetime import date, time
+from datetime import date
+from datetime import time
 from typing import Optional, List
 
 
@@ -9,9 +10,9 @@ from typing import Optional, List
 
 class PendingRequestBase(BaseModel):
     ride_id: int
-    user_id: int
+    user_id: str
     seats: int
-    booking_id: int
+    booking_id: str
     pickup_location: str
     dropoff_location: str
     status: str = "pending"
@@ -33,7 +34,7 @@ class PendingRequestResponse(PendingRequestBase):
 # ---------------------------
 
 class RideBase(BaseModel):
-    user_id: int
+    user_id: str
     origin: str
     destination: str
     date: date

@@ -6,7 +6,7 @@ from typing import Optional
 # ---------------------------------------------------------
 class SeatReservedEvent(BaseModel):
     event_type: str = "seat.reserved"
-    booking_id: int
+    booking_id: str
     ride_id: int
     seats: int
 
@@ -15,7 +15,7 @@ class SeatReservedEvent(BaseModel):
 # ---------------------------------------------------------
 class SeatReservationFailedEvent(BaseModel):
     event_type: str = "seat.reservation_failed"
-    booking_id: int
+    booking_id: str
     ride_id: int
     reason: str
 

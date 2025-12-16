@@ -16,7 +16,7 @@ class RideService:
         return new_ride
 
     @staticmethod
-    def get_rides_by_user(db: Session, user_id: int) -> List[Rides]:
+    def get_rides_by_user(db: Session, user_id: str) -> List[Rides]:
         return (
             db.query(Rides)
             .filter(Rides.user_id == user_id)
@@ -109,7 +109,7 @@ class RideService:
     def create_pending_request(
         db: Session,
         *,
-        ride_id: str,
+        ride_id: int,
         booking_id: str,
         user_id: str,
         seats_requested: int,
@@ -155,7 +155,7 @@ class RideService:
     def free_seat_after_cancellation(
         db: Session,
         *,
-        ride_id: str,
+        ride_id: int,
         seats_to_release: int,
         cancellation_reason: str
     ) -> Optional[Rides]:
