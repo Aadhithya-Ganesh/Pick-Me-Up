@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from typing import Optional
+from uuid import UUID
 
 # ---------------------------------------------------------
 # seat.reserved  (Ride → Booking)
@@ -7,7 +8,7 @@ from typing import Optional
 class SeatReservedEvent(BaseModel):
     event_type: str = "seat.reserved"
     booking_id: str
-    ride_id: int
+    ride_id: UUID
     seats: int
 
 # ---------------------------------------------------------
@@ -16,7 +17,7 @@ class SeatReservedEvent(BaseModel):
 class SeatReservationFailedEvent(BaseModel):
     event_type: str = "seat.reservation_failed"
     booking_id: str
-    ride_id: int
+    ride_id: UUID
     reason: str
 
 # ---------------------------------------------------------
@@ -24,4 +25,4 @@ class SeatReservationFailedEvent(BaseModel):
 # ---------------------------------------------------------
 class RideCancelledEvent(BaseModel):
     event_type: str = "ride.cancelled"
-    ride_id: int
+    ride_id: UUID

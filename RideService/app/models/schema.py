@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from datetime import date
 from datetime import time
 from typing import Optional, List
+from uuid import UUID
 
 
 # ---------------------------
@@ -9,25 +10,24 @@ from typing import Optional, List
 # ---------------------------
 
 class PendingRequestBase(BaseModel):
-    ride_id: int
+    ride_id: UUID
     user_id: str
     seats: int
     booking_id: str
     pickup_location: str
     dropoff_location: str
-    status: str = "pending"
-
-
-class PendingRequestCreate(PendingRequestBase):
-    pass
+    status: str = "PENDING"
 
 
 class PendingRequestResponse(PendingRequestBase):
-    id: int
+    id: UUID
 
     class Config:
         orm_mode = True
 
+
+class PendingRequestCreate(PendingRequestBase):
+    pass
 
 # ---------------------------
 # Ride Schemas
@@ -71,8 +71,8 @@ class RideUpdate(BaseModel):
 
 
 class RideResponse(RideBase):
-    """Ride response WITHOUT pending requests."""
-    id: int
+    id: UUID
     pending_requests: List[PendingRequestResponse] = []
+
     class Config:
         orm_mode = True

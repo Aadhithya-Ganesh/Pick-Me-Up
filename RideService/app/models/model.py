@@ -1,12 +1,18 @@
 from sqlalchemy import Column, Integer, String, Float, Boolean, Date, Time, Text, ForeignKey
 from sqlalchemy.orm import relationship, declarative_base
+import uuid
+from sqlalchemy.dialects.postgresql import UUID
 
 Base = declarative_base()
 
 class Rides(Base):
     __tablename__ = "rides"
 
-    id = Column(Integer, primary_key=True)
+    id = Column(
+        UUID(as_uuid=True),
+        primary_key=True,
+        default=uuid.uuid4
+    )
 
     user_id = Column(String, nullable=False)
 
@@ -29,15 +35,27 @@ class Rides(Base):
     instant_booking = Column(Boolean, default=False)
 
     # 1 Ride → Many Pending Requests
-    pending_requests = relationship("PendingRequest", back_populates="ride")
-
+    pending_requests = relationship(
+        "PendingRequest",
+        back_populates="ride",
+        cascade="all, delete-orphan"
+    )
 
 class PendingRequest(Base):
     __tablename__ = "pending_requests"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(
+        UUID(as_uuid=True),
+        primary_key=True,
+        default=uuid.uuid4
+    )
 
-    ride_id = Column(Integer, ForeignKey("rides.id"), nullable=False)
+    ride_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("rides.id", ondelete="CASCADE"),
+        nullable=False
+    )
+    
     user_id = Column(String, nullable=False)
     seats = Column(Integer, nullable=False)
 
