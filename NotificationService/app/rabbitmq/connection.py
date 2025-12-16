@@ -18,11 +18,11 @@ async def connect_rabbitmq(max_retries: int = 20, delay_seconds: int = 3):
             print(f"🔌 [RabbitMQ] Connecting (attempt {attempt}/{max_retries}) to {RABBITMQ_URL}")
             connection = await aio_pika.connect_robust(RABBITMQ_URL)
             channel = await connection.channel()
-            print("✅ [RabbitMQ] Connected and channel opened")
+            print("[RabbitMQ] Connected and channel opened")
             return channel
         except Exception as e:
-            print(f"⚠️ [RabbitMQ] Not ready yet: {e}")
+            print(f"[RabbitMQ] Not ready yet: {e}")
             if attempt == max_retries:
-                print("❌ [RabbitMQ] Failed to connect after retries, giving up")
+                print("[RabbitMQ] Failed to connect after retries, giving up")
                 raise
             await asyncio.sleep(delay_seconds)

@@ -1,6 +1,47 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 function VehicleInfoForm({ vehicleData, onInputChange, onBack, onNext }) {
+  const [errors, setErrors] = useState({});
+
+  const validateForm = () => {
+    const requiredFields = [
+      { name: 'carMake', label: 'Car Make' },
+      { name: 'carModel', label: 'Car Color' },
+      { name: 'licensePlate', label: 'License Plate' }
+    ];
+
+    const newErrors = {};
+    let isValid = true;
+
+    for (const field of requiredFields) {
+      if (!vehicleData[field.name] || vehicleData[field.name] === '') {
+        newErrors[field.name] = `${field.label} is required`;
+        isValid = false;
+      }
+    }
+
+    setErrors(newErrors);
+
+    if (!isValid) {
+      alert('Please fill in all required fields');
+    }
+
+    return isValid;
+  };
+
+  const handleNext = () => {
+    if (validateForm()) {
+      onNext();
+    }
+  };
+
+  const getInputClasses = (fieldName, baseClasses) => {
+    if (errors[fieldName]) {
+      return baseClasses.replace('border-gray-300', 'border-red-500');
+    }
+    return baseClasses;
+  };
+
   return (
     <div className="bg-white rounded-2xl shadow-sm p-8 md:p-12">
       <div className="mb-8">
@@ -33,9 +74,10 @@ function VehicleInfoForm({ vehicleData, onInputChange, onBack, onNext }) {
               <div className="relative">
                 <select
                   name="carMake"
+                  required
                   value={vehicleData.carMake}
                   onChange={onInputChange}
-                  className="w-full px-4 py-4 border border-gray-300 rounded-xl text-base text-gray-900 appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className={getInputClasses('carMake', "w-full px-4 py-4 border border-gray-300 rounded-xl text-base text-gray-900 appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent")}
                 >
                   <option value="">Select car make</option>
                   <option value="Toyota">Toyota</option>
@@ -51,29 +93,31 @@ function VehicleInfoForm({ vehicleData, onInputChange, onBack, onNext }) {
                   </svg>
                 </div>
               </div>
+              {errors.carMake && <p className="mt-1 text-sm text-red-500">{errors.carMake}</p>}
             </div>
 
             {/* Car Model */}
             <div>
               <label className="block text-base font-semibold text-gray-900 mb-2">
-                Car Model
+                Car Color
               </label>
               <div className="relative">
                 <select
                   name="carModel"
+                  required
                   value={vehicleData.carModel}
                   onChange={onInputChange}
-                  className="w-full px-4 py-4 border border-gray-300 rounded-xl text-base text-gray-900 appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className={getInputClasses('carModel', "w-full px-4 py-4 border border-gray-300 rounded-xl text-base text-gray-900 appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent")}
                 >
-                  <option value="">Select car model</option>
-                  <option value="Sedan">Sedan</option>
-                  <option value="SUV">SUV</option>
-                  <option value="Hatchback">Hatchback</option>
-                  <option value="Coupe">Coupe</option>
-                  <option value="Minivan">Minivan</option>
-                  <option value="Truck">Truck</option>
-                  <option value="Convertible">Convertible</option>
-                  <option value="Wagon">Wagon</option>
+                  <option value="">Select car color</option>
+                  <option value="Black">Black</option>
+                  <option value="White">White</option>
+                  <option value="Silver">Silver</option>
+                  <option value="Gray">Gray</option>
+                  <option value="Red">Red</option>
+                  <option value="Blue">Blue</option>
+                  <option value="Green">Green</option>
+                  <option value="Yellow">Yellow</option>
                 </select>
                 <div className="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none">
                   <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -81,6 +125,7 @@ function VehicleInfoForm({ vehicleData, onInputChange, onBack, onNext }) {
                   </svg>
                 </div>
               </div>
+              {errors.carModel && <p className="mt-1 text-sm text-red-500">{errors.carModel}</p>}
             </div>
           </div>
 
@@ -92,11 +137,13 @@ function VehicleInfoForm({ vehicleData, onInputChange, onBack, onNext }) {
             <input
               type="text"
               name="licensePlate"
+              required
               value={vehicleData.licensePlate}
               onChange={onInputChange}
-              placeholder="e.g., ABC-1234"
-              className="w-full px-4 py-4 border border-gray-300 rounded-xl text-base text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="e.g., 2m1023n"
+              className={getInputClasses('licensePlate', "w-full px-4 py-4 border border-gray-300 rounded-xl text-base text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent")}
             />
+            {errors.licensePlate && <p className="mt-1 text-sm text-red-500">{errors.licensePlate}</p>}
           </div>
 
           {/* Navigation Buttons */}
@@ -113,7 +160,7 @@ function VehicleInfoForm({ vehicleData, onInputChange, onBack, onNext }) {
             {/* Next Button */}
             <button
               type="button"
-              onClick={onNext}
+              onClick={handleNext}
               className="px-8 py-3 bg-blue-500 text-white text-base font-semibold rounded-xl hover:bg-blue-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
             >
               Next
