@@ -84,25 +84,25 @@ function DriverPage() {
 
     console.log(JSON.stringify(payload, null, 2));
 
-    // Send to API
-    try {
-      console.log('Sending request to API...');
-      const response = await rideApi.createRide(payload);
+    // // Send to API
+    // try {
+    //   console.log('Sending request to API...');
+    //   const response = await rideApi.
       
-      console.log(JSON.stringify(response, null, 2));
+    //   console.log(JSON.stringify(response, null, 2));
       
-    } catch (error) {
-      console.error('API ERROR:');
-      console.error(error);
+    // } catch (error) {
+    //   console.error('API ERROR:');
+    //   console.error(error);
       
-      if (error.response) {
-        alert(`Failed to publish ride: ${error.response.data.detail || 'Server error'}`);
-      } else if (error.request) {
-        alert('Failed to publish ride: No response from server. Please check your connection.');
-      } else {
-        alert('Failed to publish ride: ' + error.message);
-      }
-    }
+    //   if (error.response) {
+    //     alert(`Failed to publish ride: ${error.response.data.detail || 'Server error'}`);
+    //   } else if (error.request) {
+    //     alert('Failed to publish ride: No response from server. Please check your connection.');
+    //   } else {
+    //     alert('Failed to publish ride: ' + error.message);
+    //   }
+    // }
   };
 
   return (
