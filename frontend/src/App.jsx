@@ -6,16 +6,22 @@ import HomePage from "./pages/HomePage";
 import Dashboard from "./pages/Dashboard";
 import LoginPage, { action as loginAction } from "./pages/LoginPage";
 import SignupPage, { action as signupAction } from "./pages/SignupPage";
-import RiderPage from "./pages/RiderPage";
+import RiderPage, { loader as rideLoader } from "./pages/RiderPage";
 import { action as logoutAction } from "./pages/Logout";
 import DriverPage from "./pages/DriverPage";
 import NavbarRootPage from "./pages/NavbarRootPage";
-import ModeSwitchContextProvider from "./context/ModeSwitchContext";
-import RideDetailsPage from "./pages/RideDetailsPage";
+import RideDetailsPage, {
+  loader as rideDetailsLoader,
+} from "./pages/RideDetailsPage";
 import BookingPage from "./pages/BookingPage";
-import BookingDetails from "./pages/BookingDetails";
+import BookingDetails, {
+  loader as bookingDetailsLoader,
+} from "./pages/BookingDetails";
 import ProfilePage from "./pages/ProfilePage";
 import NotificationsPage from "./pages/NotificationPage";
+import BackdropLoader from "./utils/BackdropLoader";
+import MyRides, { loader as myRideLoader } from "./components/MyRides";
+import MyBooking, { loader as myBookingLoader } from "./components/MyBooking";
 
 function App() {
   const routes = createBrowserRouter([
@@ -34,19 +40,35 @@ function App() {
               path: "/dashboard",
               element: <Dashboard />,
               children: [
-                {index: true, element: <NotificationsPage /> },
+                { index: true, element: <NotificationsPage /> },
                 { path: "notifications", element: <NotificationsPage /> },
-                { path: "booking", element: <div>Your bookings...</div> },
-                { path: "rides", element: <div>Your ride history....</div> },
+                {
+                  path: "booking",
+                  element: <MyBooking />,
+                  loader: myBookingLoader,
+                },
+                { path: "rides", element: <MyRides />, loader: myRideLoader },
                 { path: "profile", element: <ProfilePage /> },
               ],
             },
             { path: "/profile", element: <ProfilePage /> },
-            { path: "/rides", element: <RiderPage /> },
+            { path: "/rides", element: <RiderPage />, loader: rideLoader },
             { path: "/offer-ride", element: <DriverPage /> },
-            { path: "/rides/:rideId", element: <RideDetailsPage /> },
-            { path: "/book/:rideId", element: <BookingPage /> },
-            { path: "/booking/:bookingId", element: <BookingDetails /> },
+            {
+              path: "/rides/:rideId",
+              element: <RideDetailsPage />,
+              loader: rideDetailsLoader,
+            },
+            {
+              path: "/book/:rideId",
+              element: <BookingPage />,
+              loader: rideDetailsLoader,
+            },
+            {
+              path: "/booking/:bookingId",
+              element: <BookingDetails />,
+              loader: bookingDetailsLoader,
+            },
           ],
         },
         { path: "login", element: <LoginPage />, action: loginAction },
@@ -57,9 +79,10 @@ function App() {
   ]);
 
   return (
-    <ModeSwitchContextProvider>
-      <RouterProvider router={routes}></RouterProvider>
-    </ModeSwitchContextProvider>
+    <RouterProvider
+      router={routes}
+      fallbackElement={<BackdropLoader />}
+    ></RouterProvider>
   );
 }
 

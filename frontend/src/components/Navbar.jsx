@@ -10,7 +10,7 @@ import defaultAvatar from "../assets/User.png";
 function Navbar() {
   const token = localStorage.getItem("token");
 
-  const [username, setUsername] = useState(localStorage.getItem("userName"));
+  const [username, setUsername] = useState(localStorage.getItem("username"));
   const [gender, setGender] = useState(localStorage.getItem("gender"));
 
   const [anchorEl, setAnchorEl] = useState(null);
@@ -20,7 +20,7 @@ function Navbar() {
     // 🔄 Sync when profile updates
   useEffect(() => {
     const syncUser = () => {
-      setUsername(localStorage.getItem("userName"));
+      setUsername(localStorage.getItem("username"));
       setGender(localStorage.getItem("gender"));
     };
 

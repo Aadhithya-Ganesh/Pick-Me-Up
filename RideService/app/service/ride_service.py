@@ -16,6 +16,14 @@ class RideService:
         return new_ride
 
     @staticmethod
+    def get_rides(db: Session, user_id: str) -> List[Rides]:
+        return (
+            db.query(Rides)
+            .filter(Rides.user_id != user_id)
+            .all()
+        )
+    
+    @staticmethod
     def get_rides_by_user(db: Session, user_id: str) -> List[Rides]:
         return (
             db.query(Rides)
@@ -24,11 +32,11 @@ class RideService:
         )
 
     @staticmethod
-    def get_ride(db: Session, ride_id: int) -> Optional[Rides]:
+    def get_ride(db: Session, ride_id: str) -> Optional[Rides]:
         return db.query(Rides).filter(Rides.id == ride_id).first()
 
     @staticmethod
-    def update_ride(db: Session, ride_id: int, ride_update: RideUpdate) -> Optional[Rides]:
+    def update_ride(db: Session, ride_id: str, ride_update: RideUpdate) -> Optional[Rides]:
         ride = db.query(Rides).filter(Rides.id == ride_id).first()
         if not ride:
             return None
@@ -41,7 +49,7 @@ class RideService:
         return ride
 
     @staticmethod
-    def delete_ride(db: Session, ride_id: int) -> Optional[Rides]:
+    def delete_ride(db: Session, ride_id: str) -> Optional[Rides]:
         ride = db.query(Rides).filter(Rides.id == ride_id).first()
         if not ride:
             return None
@@ -51,7 +59,7 @@ class RideService:
         return ride
 
     @staticmethod
-    def accept_request(db: Session, request_id: int) -> Optional[PendingRequest]:
+    def accept_request(db: Session, request_id: str) -> Optional[PendingRequest]:
         request = (
             db.query(PendingRequest)
             .filter(
@@ -86,7 +94,7 @@ class RideService:
         return request
 
     @staticmethod
-    def reject_request(db: Session, request_id: int) -> Optional[PendingRequest]:
+    def reject_request(db: Session, request_id: str) -> Optional[PendingRequest]:
         request = (
             db.query(PendingRequest)
             .filter(
@@ -109,7 +117,7 @@ class RideService:
     def create_pending_request(
         db: Session,
         *,
-        ride_id: int,
+        ride_id: str,
         booking_id: str,
         user_id: str,
         seats_requested: int,
@@ -155,7 +163,7 @@ class RideService:
     def free_seat_after_cancellation(
         db: Session,
         *,
-        ride_id: int,
+        ride_id: str,
         seats_to_release: int,
         cancellation_reason: str
     ) -> Optional[Rides]:

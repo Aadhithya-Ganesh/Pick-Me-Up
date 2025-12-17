@@ -15,7 +15,7 @@ export default function ProfilePage() {
     if (!token) return;
 
     // axios.get(`http://${import.meta.env.VITE_GATEWAY}/api/users/me`, {
-    axios.get(`http://localhost:8082/api/users/me`, {
+    axios.get(`http://localhost/api/users/me`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -41,7 +41,7 @@ export default function ProfilePage() {
 
   return (
   <>
-    <div className="w-full flex justify-center py-20 bg-gradient-to-r from-yellow-50 to-white">
+    <div className="w-full flex justify-center py-20 bg-linear-to-r from-yellow-50 to-white">
       <div className="backdrop-blur-xl bg-white/50 border border-white/40 shadow-xl rounded-3xl p-10 max-w-lg w-full">
 
           <div className="flex justify-center">

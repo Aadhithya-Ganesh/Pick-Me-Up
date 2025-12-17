@@ -1,13 +1,19 @@
-import { Form, Link, redirect } from "react-router-dom";
+import { Form, Link, redirect, useNavigation } from "react-router-dom";
 import axios from "axios";
+import BackdropLoader from "../utils/BackdropLoader";
 
-{new URLSearchParams(location.search).get("error") && (
-  <p className="text-red-600 text-center font-semibold mt-2">
-    Invalid email or password
-  </p>
-)}
+{
+  new URLSearchParams(location.search).get("error") && (
+    <p className="mt-2 text-center font-semibold text-red-600">
+      Invalid email or password
+    </p>
+  );
+}
 
 function LoginPage() {
+  const navigation = useNavigation();
+  const isSubmitting = navigation.state === "submitting";
+
   return (
     <main className="flex h-screen w-full flex-col lg:flex-row">
       <div className="flex w-full items-center justify-center bg-[url(/form-graphic.svg)] bg-contain bg-bottom-right bg-no-repeat">
@@ -74,6 +80,7 @@ function LoginPage() {
           </p>
         </div>
       </div>
+      {isSubmitting && <BackdropLoader />}
     </main>
   );
 }
@@ -85,29 +92,35 @@ export async function action({ request }) {
   const form = await request.formData();
 
   const payload = {
-    email: form.get("email"),       
+    email: form.get("email"),
     password: form.get("password"),
   };
 
   try {
-    const res = await axios.post(`http://${import.meta.env.VITE_GATEWAY}/api/auth/login`, payload);
+    const res = await axios.post(
+      `http://localhost/api/auth/login`,
+      payload,
+    );
     // const res = await axios.post(`http://localhost:8082/api/auth/login`, payload);
 
     const token = res.data.access_token;
-    
+
     localStorage.setItem("token", token);
     localStorage.setItem("email", payload.email);
 
-        // Fetch user details with /users/me
-    const me = await axios.get(`http://${import.meta.env.VITE_GATEWAY}/api/users/me`, {
-    // const me = await axios.get(`http://localhost:8082/api/users/me`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
+    // Fetch user details with /users/me
+    const me = await axios.get(
+      `http://localhost/api/users/me`,
+      {
+        // const me = await axios.get(`http://localhost:8082/api/users/me`, {
+        headers: { Authorization: `Bearer ${token}` },
+      },
+    );
 
     const fullName = me.data.firstName + " " + me.data.lastName;
     localStorage.setItem("username", fullName);
     localStorage.setItem("gender", me.data.gender);
-
+    localStorage.setItem("member_since", me.data.created_at);
     localStorage.setItem("userId", me.data.id);
 
     return redirect("/");

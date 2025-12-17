@@ -10,6 +10,14 @@ import {
 } from "lucide-react";
 
 function RideDetailsCard({ ride }) {
+  const formattedDate = new Date(
+    localStorage.getItem("member_since"),
+  ).toLocaleDateString("en-IN", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+
   return (
     <div className="h-fit rounded-2xl border border-gray-300/70 p-10">
       <p className="mb-8 text-3xl font-bold">Trip Details</p>
@@ -18,17 +26,16 @@ function RideDetailsCard({ ride }) {
           <div className="flex items-start gap-10">
             <div className="bg-primary w-fit rounded-2xl p-3">
               <p className="w-8 text-center text-2xl font-bold text-white">
-                {ride.driver.name[0]}
+                {ride.driver_name[0]}
               </p>
             </div>
             <div className="flex flex-col gap-3">
-              <p className="text-lg font-bold">{ride.driver.name}</p>
+              <p className="text-lg font-bold">{ride.driver_name}</p>
               <div className="flex items-center gap-3">
                 <Star color="#ffdd1f" className="h-5 w-5" />
                 <p>
-                  <span className="font-semibold">{ride.driver.rating}</span>{" "}
                   <span className="text-gray-400">
-                    | Member since {ride.driver.member_since}
+                    Member since {formattedDate}
                   </span>
                 </p>
               </div>
@@ -38,9 +45,9 @@ function RideDetailsCard({ ride }) {
         <div className="mt-5 ml-2 flex gap-5">
           <MapPin color="#ffdd1f" />
           <div className="flex flex-col gap-2">
-            <p className="text-lg font-semibold">{ride.from}</p>
+            <p className="text-lg font-semibold">{ride.origin}</p>
             <div className="h-10 w-10 border-l-2 border-dashed border-gray-300"></div>
-            <p className="text-lg font-semibold">{ride.to}</p>
+            <p className="text-lg font-semibold">{ride.destination}</p>
           </div>
         </div>
       </div>
@@ -74,7 +81,13 @@ function RideDetailsCard({ ride }) {
             id: 5,
             icon: <Car className="text-primary" />,
             heading: "Vechicle",
-            content: ride.car,
+            content:
+              ride.car_make +
+              " | " +
+              ride.car_color +
+              " ( " +
+              ride.license_plate +
+              " )",
           },
           {
             id: 6,

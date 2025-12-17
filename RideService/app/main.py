@@ -16,13 +16,11 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
-init_db()
-
 @app.on_event("startup")
 async def startup_event():
+    init_db()
     await init_rabbitmq()
     logging.info("RabbitMQ connection initialized")
-
     asyncio.create_task(start_consumer())
     logging.info("RabbitMQ consumer task started")
 
