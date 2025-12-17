@@ -1,15 +1,7 @@
 import { useState } from "react";
-import { useNavigate } from "react-router";
 
-function BookingSummary({ handleStepChange, location }) {
+function BookingSummary({ handleStepChange, location, onSubmit }) {
   const [agreed, setAgreed] = useState(false);
-  const navigate = useNavigate();
-
-  const handleContinue = () => {
-    if (agreed) {
-      navigate(`/booking/1`);
-    }
-  };
 
   const handleBack = () => {
     handleStepChange((prev) => prev - 1);
@@ -63,7 +55,11 @@ function BookingSummary({ handleStepChange, location }) {
         {/* Continue */}
         <button
           type="button"
-          onClick={handleContinue}
+          onClick={() => {
+            if (agreed) {
+              onSubmit();
+            }
+          }}
           disabled={!agreed}
           className={`mt-5 block w-full cursor-pointer rounded-2xl px-7 py-3 text-center font-semibold shadow-lg transition-colors ${
             agreed

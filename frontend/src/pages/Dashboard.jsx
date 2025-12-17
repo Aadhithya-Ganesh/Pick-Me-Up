@@ -1,72 +1,69 @@
-// function Dashboard() {
-//   return <>lol</>;
-// }
-
-// export default Dashboard;
-// import { Navigate } from "react-router-dom";
-
-// export default function Protected({ children }) {
-//   const token = localStorage.getItem("token");
-//   if (!token) return <Navigate to="/login" replace />;
-//   return children;
-// }
-
 import { NavLink, Outlet } from "react-router-dom";
 
 export default function Dashboard() {
-  return (
-    <div className="p-6 w-full">
+  const username = localStorage.getItem("username");
 
-      {/* Dashboard Banner */}
-      <div className="dashboard-banner">
-        <h2>Welcome back!</h2>
-        <p>“Your journey begins here.”</p>
+  return (
+    <div className="w-full">
+      <div className="bg-primary mb-10 p-20">
+        <h1 className="text-4xl font-bold text-white">{username}</h1>
       </div>
 
-      {/* ------ TABS HEADER ------ */}
-      <div className="flex gap-6 border-b pb-3 mb-6 text-lg font-semibold">
-
-        <NavLink 
+      <div className="m-6 mb-10 flex w-fit gap-2 rounded-lg bg-gray-100 p-1">
+        <NavLink
           to="notifications"
           className={({ isActive }) =>
-            isActive ? "text-primary border-b-2 border-primary pb-2" : "hover:text-primary"
+            `rounded-lg px-6 py-1 font-semibold transition ${
+              isActive
+                ? "bg-white text-black shadow"
+                : "text-gray-500 hover:text-black"
+            }`
           }
         >
           Notifications
         </NavLink>
 
-        <NavLink 
+        <NavLink
           to="booking"
           className={({ isActive }) =>
-            isActive ? "text-primary border-b-2 border-primary pb-2" : "hover:text-primary"
+            `rounded-lg px-6 py-1 font-semibold transition ${
+              isActive
+                ? "bg-white text-black shadow"
+                : "text-gray-500 hover:text-black"
+            }`
           }
         >
           My Bookings
         </NavLink>
 
-        <NavLink 
+        <NavLink
           to="rides"
           className={({ isActive }) =>
-            isActive ? "text-primary border-b-2 border-primary pb-2" : "hover:text-primary"
+            `rounded-lg px-6 py-1 font-semibold transition ${
+              isActive
+                ? "bg-white text-black shadow"
+                : "text-gray-500 hover:text-black"
+            }`
           }
         >
           My Rides
         </NavLink>
 
-        <NavLink 
+        <NavLink
           to="profile"
           className={({ isActive }) =>
-            isActive ? "text-primary border-b-2 border-primary pb-2" : "hover:text-primary"
+            `rounded-lg px-6 py-1 font-semibold transition ${
+              isActive
+                ? "bg-white text-black shadow"
+                : "text-gray-500 hover:text-black"
+            }`
           }
         >
           My Profile
         </NavLink>
-
       </div>
 
-      {/* ------ CONTENT LOADS HERE ------ */}
       <Outlet />
-
     </div>
   );
 }

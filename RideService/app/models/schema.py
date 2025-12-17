@@ -35,6 +35,7 @@ class PendingRequestCreate(PendingRequestBase):
 
 class RideBase(BaseModel):
     user_id: str
+    driver_name: str
     origin: str
     destination: str
     date: date

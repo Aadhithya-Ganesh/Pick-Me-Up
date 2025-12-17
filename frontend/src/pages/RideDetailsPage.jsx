@@ -1,24 +1,34 @@
-import { Link, useParams } from "react-router-dom";
+import { Suspense } from "react";
+import { Await, useLoaderData, Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import RideDetailsCard from "../components/RideDetailsCard";
+import BackdropLoader from "../utils/BackdropLoader";
+import PaymentDetails from "./../components/PaymentDetails";
+import { useParams, useNavigate } from "react-router-dom";
 
 function RideDetailsPage() {
-  const ride = {
-    id: 1,
-    driver: {
-      name: "Michael Brown",
-      rating: 4.7,
-      member_since: "2024",
-    },
-    car: "Chevrolet Malibu",
-    from: "Austin, TX",
-    to: "Houston, TX",
-    date: "2024-12-24",
-    time: "11:30 AM",
-    seats: 3,
-    duration: "2h 40m",
-    price: 15,
-    distance: 165,
+  const { ride } = useLoaderData();
+  const { rideId } = useParams();
+  const navigate = useNavigate();
+
+  const handleCancel = async () => {
+    try {
+      const res = await fetch(`http://localhost/api/rides/${rideId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        return;
+      }
+
+      navigate("/dashboard");
+    } catch (err) {
+      console.error("Cancel error:", err);
+    }
   };
 
   return (
@@ -32,42 +42,46 @@ function RideDetailsPage() {
           <p>Back</p>
         </Link>
       </div>
-      <div className="m-10 grid grid-cols-8 gap-5">
-        <div className="col-span-6">
-          <RideDetailsCard ride={ride} />
-        </div>
-        <div className="sticky top-40 col-span-2 h-fit rounded-2xl border border-gray-300/70 p-5">
-          <div className="border-b border-gray-300/70 pb-5">
-            <p className="mb-7 text-2xl font-semibold">Book This Ride</p>
-            <p>
-              <span className="mr-2 text-4xl font-bold">${ride.price}</span>
-              <span className="text-gray-400">per seat</span>
-            </p>
-            <Link
-              to={`/book/${ride.id}`}
-              className="bg-primary mt-5 block w-full cursor-pointer rounded-2xl px-7 py-3 text-center font-semibold text-white transition-colors ease-in hover:bg-yellow-200"
-            >
-              Continue to Booking
-            </Link>
-          </div>
-          <div className="mt-5 flex flex-col gap-2">
-            <div className="flex justify-between">
-              <p className="text-gray-400">Available seats</p>
-              <p>{ride.seats}</p>
+
+      <Suspense fallback={<BackdropLoader />}>
+        <Await resolve={ride}>
+          {(ride) => (
+            <div className="mx-20 my-10">
+              <div className="grid grid-cols-8 gap-5">
+                <div
+                  className={`${ride.user_id == localStorage.getItem("userId") ? "col-span-8" : "col-span-6"}`}
+                >
+                  <RideDetailsCard ride={ride} />
+                </div>
+                {ride.user_id == localStorage.getItem("userId") ? null : (
+                  <PaymentDetails ride={ride} />
+                )}
+              </div>
+              {ride.user_id != localStorage.getItem("userId") ? null : (
+                <button
+                  onClick={handleCancel}
+                  className="mx-auto mt-10 block w-[20%] cursor-pointer rounded-2xl bg-red-500 py-2 text-xl text-white hover:bg-red-400"
+                >
+                  Cancel
+                </button>
+              )}
             </div>
-            <div className="flex justify-between">
-              <p className="text-gray-400">Trip distance</p>
-              <p>{ride.distance} miles</p>
-            </div>
-            <div className="flex justify-between">
-              <p className="text-gray-400">Duration</p>
-              <p>{ride.duration}</p>
-            </div>
-          </div>
-        </div>
-      </div>
+          )}
+        </Await>
+      </Suspense>
     </>
   );
 }
 
 export default RideDetailsPage;
+
+export function loader({ params }) {
+  const rideId = params.rideId;
+
+  return {
+    ride: fetch(`http://localhost/api/rides/${rideId}`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    }).then((res) => res.json()),
+  };
+}

@@ -1,19 +1,18 @@
-import { Form, Link, redirect } from "react-router-dom";
+import { Form, Link, redirect, useNavigation } from "react-router-dom";
 import axios from "axios";
+import BackdropLoader from "./../utils/BackdropLoader";
 
 function SignupPage() {
+  const navigation = useNavigation();
+
+  const isSubmitting = navigation.state === "submitting";
+
   return (
     <main className="grid h-screen w-full grid-cols-1">
       {/* Left - Signup Form (2/3) */}
       <div className="flex items-center justify-center">
         <div className="flex w-full max-w-120 flex-col gap-4 p-10 sm:max-w-175">
           <h1 className="text-center text-4xl font-bold">Register</h1>
-
-          {/* <div className="mb-5 flex items-center justify-between gap-2">
-            <hr className="flex-1" />
-            <span className="text-sm text-gray-500">OR</span>
-            <hr className="flex-1" />
-          </div> */}
 
           <Form method="post" action="/signup" className="mt-5">
             <div className="mb-10 grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -30,12 +29,15 @@ function SignupPage() {
                   name="firstName"
                   required
                   pattern="^[A-Za-z]{2,20}$"
-                  title = "First Name should contain letters"
+                  title="First Name should contain letters"
                   className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2"
                 />
               </div>
               <div>
-                <label htmlFor="lastName" className="block text-sm font-semibold tracking-[2px]">
+                <label
+                  htmlFor="lastName"
+                  className="block text-sm font-semibold tracking-[2px]"
+                >
                   LAST NAME
                 </label>
                 <input
@@ -44,12 +46,15 @@ function SignupPage() {
                   name="lastName"
                   required
                   pattern="^[A-Za-z]{2,20}$"
-                  title = "Last Name should contain letters"
+                  title="Last Name should contain letters"
                   className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2"
                 />
               </div>
               <div>
-                <label htmlFor="gender" className="block text-sm font-semibold tracking-[2px]">
+                <label
+                  htmlFor="gender"
+                  className="block text-sm font-semibold tracking-[2px]"
+                >
                   GENDER
                 </label>
                 <select
@@ -134,9 +139,7 @@ function SignupPage() {
           </p>
         </div>
       </div>
-      {/* <div>
-        <img src="signup.svg" className="h-full"></img>
-      </div> */}
+      {isSubmitting && <BackdropLoader />}
     </main>
   );
 }
@@ -148,7 +151,7 @@ export const action = async ({ request }) => {
 
   const firstName = form.get("firstName");
   const lastName = form.get("lastName");
-  const gender = form.get("gender")
+  const gender = form.get("gender");
   const email = form.get("email");
   const phone = form.get("phone");
   const password = form.get("password");
@@ -159,11 +162,11 @@ export const action = async ({ request }) => {
     email,
     gender,
     phone,
-    password
+    password,
   };
 
   try {
-    await axios.post(`http://${import.meta.env.VITE_GATEWAY}/api/auth/register`, payload);
+    await axios.post(`http://localhost/api/auth/register`, payload);
     // await axios.post(`http://localhost:8082/api/auth/register`, payload);
     return redirect("/login?signup=1");
   } catch (err) {

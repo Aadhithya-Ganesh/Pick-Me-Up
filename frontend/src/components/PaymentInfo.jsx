@@ -8,9 +8,9 @@ function PaymentInfo({ ride, seats }) {
         <div className="mt-5 flex gap-5">
           <MapPin color="#ffdd1f" />
           <div className="flex flex-col gap-2">
-            <p className="text-lg font-semibold">{ride.from}</p>
+            <p className="text-lg font-semibold">{ride.origin}</p>
             <div className="h-10 w-10 border-l-2 border-dashed border-gray-300"></div>
-            <p className="text-lg font-semibold">{ride.to}</p>
+            <p className="text-lg font-semibold">{ride.destination}</p>
           </div>
         </div>
         <div className="mt-5 flex flex-col gap-5">

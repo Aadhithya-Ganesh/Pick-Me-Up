@@ -15,6 +15,7 @@ class Rides(Base):
     )
 
     user_id = Column(String, nullable=False)
+    driver_name = Column(String, nullable=False)
 
     origin = Column(String, nullable=False)
     destination = Column(String, nullable=False)
