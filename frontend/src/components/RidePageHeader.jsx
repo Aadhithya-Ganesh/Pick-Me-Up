@@ -6,7 +6,6 @@ function RidePageHeader() {
       <p className="text-text text-center text-4xl font-bold">
         Find Your Perfect Ride
       </p>
-      <RideSearchForm />
     </div>
   );
 }

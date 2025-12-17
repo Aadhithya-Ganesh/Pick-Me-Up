@@ -24,11 +24,6 @@ function PaymentDetails({ ride }) {
         </div>
 
         <div className="flex justify-between">
-          <p className="text-gray-400">Trip distance</p>
-          <p>{ride.distance} miles</p>
-        </div>
-
-        <div className="flex justify-between">
           <p className="text-gray-400">Duration</p>
           <p>{ride.duration}</p>
         </div>
