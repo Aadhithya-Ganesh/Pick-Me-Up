@@ -11,7 +11,6 @@ function HomePageHeader() {
         Find affordable rides or offer your empty seats. Make travel sustainable
         and social.
       </p>
-      <RideSearchForm />
       <div className="m-auto mt-10 flex w-[40%] justify-center gap-10">
         <NavLink
           to="/rides"
