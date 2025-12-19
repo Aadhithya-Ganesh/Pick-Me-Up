@@ -2,7 +2,6 @@ from pydantic import BaseModel, EmailStr
 from typing import Optional
 from datetime import datetime
 
-# Base schema for shared fields
 class UserBase(BaseModel):
     firstName: str
     lastName: str
@@ -10,16 +9,13 @@ class UserBase(BaseModel):
     email: EmailStr
     phone: str | None = None
 
-#for Registration
 class UserCreate(UserBase):
     password: str
 
-# Schema for Login
 class UserLogin(BaseModel):
     email: EmailStr
     password: str
 
-# Sending back user information
 class UserResponse(UserBase):
     id: str
     created_at: datetime
@@ -31,14 +27,12 @@ class UserUpdate(BaseModel):
     firstName: Optional[str] = None
     lastName: Optional[str] = None
     gender: Optional[str] = None
-    phone: Optional[str] = None
-    
-# JWT access token response
+    phone: Optional[str] = None 
+
 class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"
 
-# Internal token data (after decoding JWT)
 class TokenData(BaseModel):
     id: Optional[str] = None
     email: Optional[EmailStr] = None

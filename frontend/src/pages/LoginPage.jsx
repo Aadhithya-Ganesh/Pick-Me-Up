@@ -4,8 +4,8 @@ import BackdropLoader from "../utils/BackdropLoader";
 
 {
   new URLSearchParams(location.search).get("error") && (
-    <p className="mt-2 text-center font-semibold text-red-600">
-      Invalid email or password
+    <p className="text-red-600 text-center font-semibold mt-2">
+    Invalid email or password
     </p>
   );
 }
@@ -18,7 +18,7 @@ function LoginPage() {
     <main className="flex h-screen w-full flex-col lg:flex-row">
       <div className="flex w-full items-center justify-center bg-[url(/form-graphic.svg)] bg-contain bg-bottom-right bg-no-repeat">
         <div className="w-full max-w-150 p-10">
-          <h1 className="my-5 text-center text-4xl font-bold">Sign In</h1>
+          <h1 className="my-5 text-center text-4xl font-bold">SIGN IN</h1>
 
           <Form
             className="mt-5 flex flex-col gap-4"
@@ -38,7 +38,7 @@ function LoginPage() {
                 name="email"
                 required
                 pattern="^[^\s@]+@[^\s@]+\.com$"
-                title="Enter a valid email, example: user@example.com"
+                title="Enter a valid email. Example: user@example.com"
                 className="mt-2 w-full rounded-2xl border-2 border-gray-200 px-3 py-3"
               />
             </div>
@@ -65,7 +65,7 @@ function LoginPage() {
               type="submit"
               className="bg-primary m-auto my-5 block w-2/3 cursor-pointer rounded-full px-[25px] py-3 text-xs font-bold text-white shadow-xl transition-colors ease-in hover:bg-yellow-200 md:text-sm"
             >
-              Submit
+              SUBMIT
             </button>
           </Form>
 
@@ -75,7 +75,7 @@ function LoginPage() {
               to="/signup"
               className="text-primary font-semibold hover:underline"
             >
-              Sign up
+              SIGNUP
             </Link>
           </p>
         </div>
@@ -101,18 +101,13 @@ export async function action({ request }) {
       `http://localhost/api/auth/login`,
       payload,
     );
-    // const res = await axios.post(`http://localhost:8082/api/auth/login`, payload);
-
     const token = res.data.access_token;
 
     localStorage.setItem("token", token);
     localStorage.setItem("email", payload.email);
-
-    // Fetch user details with /users/me
     const me = await axios.get(
       `http://localhost/api/users/me`,
       {
-        // const me = await axios.get(`http://localhost:8082/api/users/me`, {
         headers: { Authorization: `Bearer ${token}` },
       },
     );

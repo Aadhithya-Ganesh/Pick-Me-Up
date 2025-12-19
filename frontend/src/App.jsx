@@ -22,6 +22,7 @@ import NotificationsPage from "./pages/NotificationPage";
 import BackdropLoader from "./utils/BackdropLoader";
 import MyRides, { loader as myRideLoader } from "./components/MyRides";
 import MyBooking, { loader as myBookingLoader } from "./components/MyBooking";
+import ProtectedRoute from "./utils/ProtectedRoute";
 
 function App() {
   const routes = createBrowserRouter([
@@ -38,7 +39,11 @@ function App() {
             { index: true, element: <HomePage /> },
             {
               path: "/dashboard",
-              element: <Dashboard />,
+              element: (
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              ),                
               children: [
                 { index: true, element: <NotificationsPage /> },
                 { path: "notifications", element: <NotificationsPage /> },

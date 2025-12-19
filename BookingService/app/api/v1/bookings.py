@@ -7,7 +7,6 @@ from app.models.schemas import (
     BookingResponse,
     BookingListResponse,
     BookingCancel,
-    ErrorResponse,
     BookingStatus
 )
 from app.services.booking_service import BookingService
@@ -52,7 +51,6 @@ async def create_booking(
         
         logger.info(f"Lock acquired for ride {booking_data.ride_id}")
         
-        # Check duplicate booking
         if booking_service.check_user_has_pending_booking(x_user_id, booking_data.ride_id):
             raise HTTPException(
                 status_code=400,
@@ -62,9 +60,13 @@ async def create_booking(
                 }
             )
         
-        # Create booking
         booking = booking_service.create_booking(x_user_id, booking_data)
-        
+        # ----------
+        try:
+            await EventService.publish_booking_created(booking)
+        except Exception as e:
+            logger.error(f"Failed to publish booking.created (booking still created): {e}")
+        # ------------
         try:
             await EventService.publish_seat_reserve_requested(booking)
         except Exception as e:
@@ -99,8 +101,7 @@ async def get_booking_status(
     
     if not booking:
         raise HTTPException(status_code=404, detail="Booking not found")
-    
-    # authorization
+
     if booking.user_id != x_user_id:
         raise HTTPException(status_code=403, detail="Not authorized to view this booking")
     
@@ -179,7 +180,6 @@ async def cancel_booking(
     if not booking:
         raise HTTPException(status_code=404, detail="Booking not found")
     
-    # authorization
     if booking.user_id != x_user_id:
         raise HTTPException(status_code=403, detail="Not authorized to cancel this booking")
     
@@ -188,7 +188,6 @@ async def cancel_booking(
             status_code=400,
             detail=f"Cannot cancel booking with status {booking.status}"
         )
-
     cancellation_reason = None
     if cancellation_data:
         cancellation_reason = cancellation_data.cancellation_reason

@@ -1,68 +1,66 @@
 import { NavLink, Outlet } from "react-router-dom";
 
 export default function Dashboard() {
-  const username = localStorage.getItem("username");
-
   return (
-    <div className="w-full">
-      <div className="bg-primary mb-10 p-20">
-        <h1 className="text-4xl font-bold text-white">{username}</h1>
+    <div className="p-6 w-full">
+      <div className="dashboard-banner mb-6">
+        <h2 className="text-xl font-bold">Welcome back!</h2>
+        <p className="text-gray-500">Your journey begins here.</p>
       </div>
 
-      <div className="m-6 mb-10 flex w-fit gap-2 rounded-lg bg-gray-100 p-1">
-        <NavLink
+      <div className="inline-flex rounded-full bg-gray-100 p-1 mb-8">
+        <NavLink 
           to="notifications"
-          className={({ isActive }) =>
-            `rounded-lg px-6 py-1 font-semibold transition ${
+          className = {({ isActive }) =>
+            `px-6 py-2 rounded-full text-sm font-semibold transition ${
               isActive
-                ? "bg-white text-black shadow"
-                : "text-gray-500 hover:text-black"
+                ? "bg-black shadow text-white"
+                : "text-white-500 hover:bg-yellow-200"
             }`
           }
         >
-          Notifications
+          NOTIFICATIONS
         </NavLink>
 
         <NavLink
           to="booking"
-          className={({ isActive }) =>
-            `rounded-lg px-6 py-1 font-semibold transition ${
+          className = {({ isActive }) =>
+            `px-6 py-2 rounded-full text-sm font-semibold transition ${
               isActive
-                ? "bg-white text-black shadow"
-                : "text-gray-500 hover:text-black"
+                ? "bg-black shadow text-white"
+                : "text-white-500 hover:bg-yellow-200"
             }`
           }
         >
-          My Bookings
+          MY BOOKINGS
         </NavLink>
 
         <NavLink
           to="rides"
-          className={({ isActive }) =>
-            `rounded-lg px-6 py-1 font-semibold transition ${
+          className = {({ isActive }) =>
+            `px-6 py-2 rounded-full text-sm font-semibold transition ${
               isActive
-                ? "bg-white text-black shadow"
-                : "text-gray-500 hover:text-black"
+                ? "bg-black shadow text-white"
+                : "text-white-500 hover:bg-yellow-200"
             }`
           }
         >
-          My Rides
+          MY RIDES
         </NavLink>
 
         <NavLink
           to="profile"
-          className={({ isActive }) =>
-            `rounded-lg px-6 py-1 font-semibold transition ${
+          className = {({ isActive }) =>
+            `px-6 py-2 rounded-full text-sm font-semibold transition ${
               isActive
-                ? "bg-white text-black shadow"
-                : "text-gray-500 hover:text-black"
+                ? "bg-black shadow text-white"
+                : "text-white-500 hover:bg-yellow-200"
             }`
           }
         >
-          My Profile
+          MY PROFILE
         </NavLink>
       </div>
-
       <Outlet />
     </div>
   );

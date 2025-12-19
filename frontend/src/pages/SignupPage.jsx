@@ -4,12 +4,10 @@ import BackdropLoader from "./../utils/BackdropLoader";
 
 function SignupPage() {
   const navigation = useNavigation();
-
   const isSubmitting = navigation.state === "submitting";
 
   return (
     <main className="grid h-screen w-full grid-cols-1">
-      {/* Left - Signup Form (2/3) */}
       <div className="flex items-center justify-center">
         <div className="flex w-full max-w-120 flex-col gap-4 p-10 sm:max-w-175">
           <h1 className="text-center text-4xl font-bold">Register</h1>
@@ -21,7 +19,7 @@ function SignupPage() {
                   htmlFor="firstName"
                   className="block text-sm font-semibold tracking-[2px]"
                 >
-                  FIRSTNAME
+                  FIRST NAME
                 </label>
                 <input
                   type="text"
@@ -45,7 +43,7 @@ function SignupPage() {
                   id="lastName"
                   name="lastName"
                   required
-                  pattern="^[A-Za-z]{2,20}$"
+                  pattern="^[A-Za-z]{1,20}$"
                   title="Last Name should contain letters"
                   className="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2"
                 />

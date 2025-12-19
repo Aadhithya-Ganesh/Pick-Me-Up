@@ -2,19 +2,37 @@ from app.rabbitmq.rabbitmq import rabbitmq_client
 from app.rabbitmq.schema import (
     SeatReservedEvent,
     SeatReservationFailedEvent,
-    RideCancelledEvent
+    RideCancelledEvent,
+    RidePublishedEvent
 )
 import logging
 
 logger = logging.getLogger(__name__)
 
 class EventService:
+    # ----
+    @staticmethod
+    async def publish_ride_published(ride):
+        event = RidePublishedEvent(
+            data={
+                "driver_id": ride.user_id,
+                "ride_id": str(ride.id)
+                })
+        await rabbitmq_client.publish_event(
+            exchange_name="ride_events",
+            routing_key="ride.published",
+            message=event.model_dump(mode="json"),
+        )
+    # -----
     @staticmethod
     async def publish_seat_reserved(pending_request):
         event = SeatReservedEvent(
             booking_id=pending_request.booking_id,
             ride_id=pending_request.ride_id,
             seats=pending_request.seats,
+            # ---
+            user_id=pending_request.user_id
+            # ---
         )
 
         await rabbitmq_client.publish_event(

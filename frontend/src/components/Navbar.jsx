@@ -17,7 +17,6 @@ function Navbar() {
   const navigate = useNavigate();
   const submit = useSubmit();
 
-    // 🔄 Sync when profile updates
   useEffect(() => {
     const syncUser = () => {
       setUsername(localStorage.getItem("username"));
@@ -93,7 +92,6 @@ function Navbar() {
 
       {token && (
         <>
-          {/* Avatar that opens the menu */}
           <button
             type="button"
             onClick={handleMenuOpen}
@@ -124,15 +122,13 @@ function Navbar() {
             transformOrigin={{ horizontal: "right", vertical: "top" }}
             anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
           >
-            {/* User Info Header */}
             <div className="px-4 py-3">
               <p className="truncate text-sm font-semibold text-gray-900">
                 {username || "Unknown User"}
               </p>
             </div>
             <hr className="mx-3 my-1 border-gray-200" />
-
-            {/* Account */}
+            
             <MenuItem
               onClick={() => {
                 handleMenuClose();
@@ -151,7 +147,6 @@ function Navbar() {
               Account
             </MenuItem>
 
-            {/* Logout */}
             <MenuItem
               disableGutters
               sx={{

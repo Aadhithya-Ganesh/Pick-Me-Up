@@ -26,3 +26,10 @@ class SeatReservationFailedEvent(BaseModel):
 class RideCancelledEvent(BaseModel):
     event_type: str = "ride.cancelled"
     ride_id: UUID
+
+# ---------------------------------------------------------
+# ride.published (Ride → Booking)
+# ---------------------------------------------------------
+class RidePublishedEvent(BaseModel):
+    event_type: str = "ride.published"
+    data: dict
