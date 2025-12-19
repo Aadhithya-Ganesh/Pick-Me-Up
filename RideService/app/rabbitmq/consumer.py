@@ -1,12 +1,13 @@
 import asyncio
+import logging
+import json
+import os
 from aio_pika import connect_robust, ExchangeType, IncomingMessage
 from app.database import SessionLocal
 from app.service.ride_service import RideService
 from app.rabbitmq.event_service import EventService
 from app.models.model import PendingRequest
-import logging
-import json
-import os
+
 
 logging.basicConfig(
     level=logging.INFO,
@@ -130,7 +131,6 @@ async def start_consumer():
             durable=True
         )
 
-        # listen for both events
         await queue.bind(booking_events_exchange, "seat.reserve_requested")
         await queue.bind(booking_events_exchange, "booking.cancelled")
 

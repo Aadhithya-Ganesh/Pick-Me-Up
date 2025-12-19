@@ -1,8 +1,6 @@
 from typing import List
 from fastapi import Depends, APIRouter, HTTPException
-import requests
 from sqlalchemy.orm import Session
-
 from app.database import get_db
 from app.models.schema import (
     RideCreate,
@@ -14,11 +12,15 @@ from app.rabbitmq.event_service import EventService
 
 router = APIRouter(prefix="/api/rides", tags=["rides"])
 
+# ----
 @router.post("/", response_model=RideResponse, status_code=201)
-def create_ride(ride: RideCreate, db: Session = Depends(get_db)):
-    return RideService.create_ride(db, ride)
+async def create_ride(ride: RideCreate, db: Session = Depends(get_db)):
+    new_ride = RideService.create_ride(db, ride)
 
+    await EventService.publish_ride_published(new_ride)
 
+    return new_ride
+# ---
 @router.get("/rides", response_model=List[RideResponse])
 def get_all_rides(user_id: str, db: Session = Depends(get_db)):
     return RideService.get_rides(db, user_id)
@@ -48,7 +50,6 @@ async def delete_ride(ride_id: str, db: Session = Depends(get_db)):
     if not ride:
         raise HTTPException(status_code=404, detail="Ride not found.")
 
-    # EVENT after DB change
     await EventService.publish_ride_cancelled(ride)
 
     return
@@ -59,7 +60,6 @@ async def accept_request(request_id: str, db: Session = Depends(get_db)):
     if not pending_request:
         raise HTTPException(status_code=404, detail="Pending request not found.")
 
-    # EVENT after DB update
     await EventService.publish_seat_reserved(
         pending_request=pending_request
     )
@@ -73,7 +73,6 @@ async def reject_request(request_id: str, db: Session = Depends(get_db)):
     if not rejected_request:
         raise HTTPException(status_code=404, detail="Pending request not found.")
 
-    # EVENT after DB update
     await EventService.publish_seat_reservation_failed(
         pending_request=rejected_request,
         reason="Driver rejected request"

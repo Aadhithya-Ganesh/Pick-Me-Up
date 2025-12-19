@@ -71,8 +71,6 @@ services:
       - backend
       - frontend
     depends_on:
-      rabbitmq:
-        condition: service_healthy
       database:
         condition: service_healthy
     env_file:
@@ -168,7 +166,6 @@ services:
       - ./create-db.sql:/docker-entrypoint-initdb.d/01_create_dbs.sql:ro
     restart: unless-stopped
     healthcheck:
-      # test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d rides"]
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
       interval: 10s
       timeout: 5s
@@ -182,6 +179,8 @@ services:
     networks:
       - frontend
     depends_on:
+      notification-service:
+        condition: service_healthy
       ride-service:
         condition: service_healthy
       booking-service:

@@ -6,5 +6,6 @@ export async function action() {
   localStorage.removeItem("email");
   localStorage.removeItem("gender");
   localStorage.removeItem("userId");
+  localStorage.removeItem("member_since");
   return redirect("/");
 }

@@ -69,7 +69,7 @@ class BookingService:
                 status_enum = BookingStatus(status)
                 query = query.filter(Booking.status == status_enum)
             except ValueError:
-                logger.warning(f"⚠️ Invalid status filter: {status}")
+                logger.warning(f" Invalid status filter: {status}")
         
         total = query.count()
         

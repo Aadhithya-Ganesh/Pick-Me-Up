@@ -1,12 +1,11 @@
+import logging
+import asyncio
 from fastapi import FastAPI
 from app.database import init_db, get_db_health
 from app.controller.rides import router as ridesRouter
-import logging
 from app.rabbitmq.rabbitmq import init_rabbitmq, get_rabbitmq_health
-import asyncio
 from app.rabbitmq.consumer import start_consumer
 
-# Configure logging
 logging.basicConfig(
     level=logging.INFO,
     format=f'%(asctime)s - RideService - %(levelname)s - %(message)s'
@@ -30,7 +29,6 @@ async def health_check():
     db_health = get_db_health()
     rabbitmq_health = get_rabbitmq_health()  
     
-    # Overall health status
     is_healthy = (
         db_health["status"] == "connected" and 
         rabbitmq_health["status"] == "connected"  

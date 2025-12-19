@@ -1,19 +1,18 @@
 from sqlalchemy import create_engine, text
-from sqlalchemy.orm import sessionmaker, Session
-from sqlalchemy.pool import StaticPool
+from sqlalchemy.orm import sessionmaker
+# from sqlalchemy.pool import StaticPool
 from app.config import settings
 from app.models.booking import Base
 import logging
 
 logger = logging.getLogger(__name__)
 
-# Create engine with connection pooling
 engine = create_engine(
     settings.DATABASE_URL,
     pool_pre_ping=True,       
-    pool_size=10,             # Max 10 connections per instance
-    max_overflow=20,          # Allowing 20 extra connections 
-    echo=settings.DEBUG       # Logging SQL queries 
+    pool_size=10, 
+    max_overflow=20,    
+    echo=settings.DEBUG     
 )
 
 SessionLocal = sessionmaker(

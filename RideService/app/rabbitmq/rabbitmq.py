@@ -13,7 +13,6 @@ RABBITMQ_HOST = os.getenv("RABBITMQ_HOST")
 RABBITMQ_PORT = os.getenv("RABBITMQ_PORT")
 
 class RabbitMQClient:
-    """RabbitMQ client for publishing and consuming events"""
     
     def __init__(self):
         self.connection: Optional[AbstractRobustConnection] = None
@@ -30,7 +29,6 @@ class RabbitMQClient:
             
             self.connection = await connect_robust(rabbitmq_url)
             
-            # Create channel
             self.channel = await self.connection.channel()
             
             await self.channel.set_qos(prefetch_count=10)
@@ -88,7 +86,6 @@ class RabbitMQClient:
                 delivery_mode=aio_pika.DeliveryMode.PERSISTENT 
             )
             
-            # Publish message
             await exchange.publish(
                 rabbitmq_message,
                 routing_key=routing_key

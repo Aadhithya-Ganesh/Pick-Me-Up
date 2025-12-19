@@ -4,7 +4,6 @@ import MaleUser from "../assets/MaleUser.png";
 import FemaleUser from "../assets/FemaleUser.png";
 import User from "../assets/User.png";
 import EditProfileModal from "../components/EditProfileModal";
-// import { UserCircle, Mail, Phone, Calendar } from "lucide-react";
 
 export default function ProfilePage() {
   const [user, setUser] = useState(null);
@@ -14,7 +13,6 @@ export default function ProfilePage() {
   useEffect(() => {
     if (!token) return;
 
-    // axios.get(`http://${import.meta.env.VITE_GATEWAY}/api/users/me`, {
     axios.get(`http://localhost/api/users/me`, {
       headers: {
         Authorization: `Bearer ${token}`
@@ -41,10 +39,9 @@ export default function ProfilePage() {
 
   return (
   <>
-    <div className="w-full flex justify-center py-20 bg-linear-to-r from-yellow-50 to-white">
-      <div className="backdrop-blur-xl bg-white/50 border border-white/40 shadow-xl rounded-3xl p-10 max-w-lg w-full">
-
-          <div className="flex justify-center">
+    <div className="min-h-screen flex justify-center items-start pt-20 bg-gradient-to-br from-yellow-50 via-white to-yellow-100">
+        <div className="relative w-full max-w-xl bg-white rounded-3xl shadow-xl p-10">
+          <div className="absolute -top-14 left-1/2 -translate-x-1/2">
             <img
               src={
                 user.gender === "Male"
@@ -58,35 +55,36 @@ export default function ProfilePage() {
             />
           </div>
 
-          <h2 className="text-3xl font-bold text-center mt-4">
+          <div className="mt-16 bg-gray-50 rounded-xl text-center">
+            <h2 className="text-3xl font-bold text-gray-800">
             {user.firstName} {user.lastName}
           </h2>
+          <p className="text-gray-500 mt-1">{user.email}</p>
+          </div>
 
-          <p className="text-center text-gray-700">{user.email}</p>
-
-          <div className="text-center mt-3">
-            <p className="text-lg font-semibold text-primary">
-              Member Since: {formattedDate}
+        <div className="mt-6 flex justify-center">
+          <div className="flex items-center gap-4">
+            <div className="w-2 h-2 rounded-full bg-primary"></div>
+            <p className="text-sm text-gray-600">
+              Joined on <span className="font-semibold">{formattedDate}</span>
             </p>
           </div>
+        </div>
 
           <div className="mt-6 space-y-3">
-            <p><strong>User ID:</strong> {user.id}</p>
-            <p><strong>Gender:</strong> {user.gender}</p>
-            <p><strong>Phone:</strong> {user.phone}</p>
+            <InfoRow label="User ID" value={user.id} />
+            <InfoRow label="Gender" value={user.gender || "—"} />
+            <InfoRow label="Phone" value={user.phone || "—"} />
           </div>
-        
-        {/* EDIT BUTTON */}
           <button
             onClick={() => setShowEdit(true)}
-            className="mt-6 w-full bg-gray-800 text-white py-2 rounded"
+            className="mt-6 w-full bg-gray-900 hover:bg-green-800 text-white py-3 rounded-xl font-semibold transition"
           >
             Edit Profile
           </button>
         </div>
       </div>
 
-    {/* MODAL */}
     {showEdit && (
           <EditProfileModal
             user={user}
@@ -98,5 +96,13 @@ export default function ProfilePage() {
           />
         )}
     </>
+  );
+}
+function InfoRow({ label, value }) {
+  return (
+    <div className="flex justify-between items-center border-b pb-2">
+      <span className="text-gray-500">{label}</span>
+      <span className="font-medium text-gray-800">{value}</span>
+    </div>
   );
 }

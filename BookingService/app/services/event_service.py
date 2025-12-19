@@ -2,8 +2,9 @@ from app.events.schemas import (
     SeatReserveRequestedEvent,
     BookingConfirmedEvent,
     BookingCancelledEvent,
-    BookingExpiredEvent
+    BookingExpiredEvent,
 )
+from app.core.rabbitmq import rabbitmq_client
 from app.config import settings
 from app.models.booking import Booking
 import logging
@@ -22,6 +23,24 @@ class EventService:
         )
         connection = await aio_pika.connect_robust(rabbitmq_url)
         return connection
+    # ----------------
+    @staticmethod
+    async def publish_booking_created(booking):
+        event = {
+            "event_type": "booking.created",
+            "data": {
+                "user_id": booking.user_id,
+                "booking_id": booking.booking_id,
+                "ride_id": booking.ride_id
+            }
+        }
+        await rabbitmq_client.publish_event(
+            exchange_name="booking_events",
+            routing_key="booking.created",
+            message=event
+        )
+        logger.info(f"[EVENT] booking.created → booking={booking.id}")
+    # ----------
     
     @staticmethod
     async def publish_event(exchange_name: str, routing_key: str, message: dict):
@@ -29,8 +48,14 @@ class EventService:
             connection = await EventService.get_rabbitmq_connection()
             channel = await connection.channel()
             
-            exchange = await channel.get_exchange(exchange_name)
-            
+            # exchange = await channel.get_exchange(exchange_name)
+            #-----------------
+            exchange = await channel.declare_exchange(
+            name=exchange_name,
+            type=aio_pika.ExchangeType.TOPIC,
+            durable=True
+        )
+            # -------------- 
             message_body = json.dumps(message).encode()
             
             rabbitmq_message = aio_pika.Message(

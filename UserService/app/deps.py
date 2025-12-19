@@ -2,7 +2,6 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer
 from jose import JWTError, jwt
 from sqlalchemy.orm import Session
-
 from app.config import SECRET_KEY, ALGORITHM
 from app.db import get_db
 from app import models
