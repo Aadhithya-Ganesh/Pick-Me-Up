@@ -116,4 +116,24 @@ docker compose up --build
 localhost
 ```
 
+NOTE: If certain services fail to start, It because of descripency in to order in which they have to start. It happens sometimes and to ensure the services are started properly, follow the below steps instead.
+
+```bash
+docker compose up rabbitmq database redis adminer --build
+```
+
+```bash
+docker compose up ride-service user-service booking-service notification-service --build
+```
+
+```bash
+docker compose up frontend --build
+```
+
+To stop the services
+
+```bash
+docker compose downn # include -v to remove the volumes
+```
+
 ## Kubernetes Deployment

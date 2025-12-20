@@ -1,16 +1,89 @@
-# React + Vite
+# 🚗 PickMeUp – Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+PickMeUp is a ride-sharing web app built using a microservices architecture.  
+This repository contains the **frontend SPA**, served through **NGINX** and communicating with backend services via an API gateway.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 Tech Stack
 
-## React Compiler
+- React + Vite
+- React Router DOM
+- Axios REST client
+- JWT authentication
+- Protected routing
+- Docker container for deployment
+- NGINX reverse proxy
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+# 🔀 Routing Overview
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+This project has **two routing layers**:
+
+---
+
+## 1️⃣ Backend Routing via NGINX API Gateway
+
+All API requests are routed through the gateway.  
+These route prefixes correspond to backend microservices:
+
+| NGINX Route Prefix | Microservice |
+|---|---|
+| `/api/auth/` | Auth / User Service |
+| `/api/users/` | User Service |
+| `/api/rides/` | Ride Service |
+| `/api/bookings/` | Booking Service |
+| `/api/notifications/` | Notification Service |
+
+## 2️⃣ Frontend Client-Side Routes (React Router DOM)
+
+### Public Routes
+
+| Path | Description |
+|---|---|
+| `/` | Home Page |
+| `/rides` | All available rides |
+| `/rides/:rideId` | Ride details |
+| `/book/:rideId` | Booking form |
+| `/booking/:bookingId` | Booking details |
+| `/offer-ride` | Driver ride posting |
+| `/login` | Login page |
+| `/signup` | Signup page |
+| `/logout` | Logout action |
+| `/profile` | User profile |
+
+### Protected Dashboard Routes
+
+The dashboard requires authentication.
+
+| Path | Description |
+|---|---|
+| `/dashboard` | Dashboard index |
+| `/dashboard/notifications` | Notifications |
+| `/dashboard/booking` | User bookings |
+| `/dashboard/rides` | User posted rides |
+| `/dashboard/profile` | User profile |
+
+---
+
+## 🧭 Route Structure (Tree)
+
+```
+/
+├─ login
+├─ signup
+├─ logout
+├─ dashboard
+│ ├─ notifications
+│ ├─ booking
+│ ├─ rides
+│ └─ profile
+├─ rides
+│ └─ :rideId
+├─ book/:rideId
+├─ booking/:bookingId
+├─ offer-ride
+├─ profile
+└─ (index) Home
+```
