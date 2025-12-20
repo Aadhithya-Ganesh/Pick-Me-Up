@@ -22,7 +22,6 @@ function DriverPage() {
     licensePlate: "",
   });
 
-  const [instantBooking, setInstantBooking] = useState(true);
   const [agreeToTerms, setAgreeToTerms] = useState(false);
 
   const navigate = useNavigate();
@@ -81,7 +80,6 @@ function DriverPage() {
       car_color: vehicleData.carModel,
       license_plate: vehicleData.licensePlate,
       notes: null,
-      instant_booking: instantBooking,
     };
 
     console.log(JSON.stringify(payload, null, 2));
@@ -316,49 +314,6 @@ function DriverPage() {
 
             {/* Divider */}
             <div className="my-8 border-t border-gray-300"></div>
-
-            {/* Instant Booking Toggle */}
-            <div className="mb-6">
-              <div className="flex items-center justify-between rounded-xl border border-gray-300 p-6">
-                <div className="flex-1">
-                  <div className="mb-1 flex items-center gap-2">
-                    <h3 className="text-lg font-bold text-gray-900">
-                      Instant Booking
-                    </h3>
-                    <button className="text-gray-400 hover:text-gray-600">
-                      <svg
-                        className="h-5 w-5"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                        />
-                      </svg>
-                    </button>
-                  </div>
-                  <p className="text-gray-600">
-                    Allow instant booking without approval
-                  </p>
-                </div>
-                <button
-                  onClick={() => setInstantBooking(!instantBooking)}
-                  className={`relative inline-flex h-8 w-16 items-center rounded-full transition-colors focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none ${
-                    instantBooking ? "bg-blue-500" : "bg-gray-300"
-                  }`}
-                >
-                  <span
-                    className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${
-                      instantBooking ? "translate-x-9" : "translate-x-1"
-                    }`}
-                  />
-                </button>
-              </div>
-            </div>
 
             {/* Terms and Conditions Checkbox */}
             <div className="mb-8">
