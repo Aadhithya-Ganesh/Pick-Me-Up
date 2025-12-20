@@ -22,6 +22,7 @@ function BookingPageContent({ ride }) {
     }
 
     try {
+      // console.log(ride);
       const res = await fetch("http://localhost/api/bookings/", {
         method: "POST",
         headers: {
@@ -34,6 +35,16 @@ function BookingPageContent({ ride }) {
           seats_requested: seats,
           pickup_location: location.pickup,
           dropoff_location: location.drop,
+          price: ride.price,
+          duration: ride.duration,
+          time: ride.time,
+          date: ride.date,
+          car_make: ride.car_make,
+          car_color: ride.car_color,
+          license_plate: ride.license_plate,
+          driver_name: ride.driver_name,
+          origin: ride.origin,
+          destination: ride.destination,
         }),
       });
 

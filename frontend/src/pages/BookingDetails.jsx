@@ -1,36 +1,30 @@
 import { ArrowLeft, CheckCircle, Clock, Check, XCircle } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLoaderData } from "react-router-dom";
 import { useState } from "react";
-import DriverInformationCard from "../components/DriverInformationCard";
 import TripInformationCard from "../components/TripInformationCard";
 import CancelBookingModal from "../components/CancelBookingModal";
 
 function BookingDetails() {
   const navigate = useNavigate();
+  const booking = useLoaderData();  // ← Get data from loader
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  // Map booking data to trip object
   const trip = {
-    status: "pending",
+    status: booking.status.toLowerCase(), // "PENDING" → "pending"
     origin: {
-      city: "New York, NY",
-      address: "adad",
+      city: booking.origin || "N/A",
+      address: booking.pickup_location || "N/A",
     },
     destination: {
-      city: "Boston, MA",
-      address: "dada",
+      city: booking.destination || "N/A",
+      address: booking.dropoff_location || "N/A",
     },
-    date: "2024-12-20",
-    time: "08:00 AM",
-    seats: 1,
-    price: 25,
-    vehicle: "Toyota Camry (Silver)",
-  };
-
-  const driver = {
-    name: "Sarah Johnson",
-    memberSince: "2021",
-    phone: "+1 234 567 8901",
-    email: "sarah.j@email.com",
+    date: booking.ride_date || "N/A",
+    time: booking.departure_time || "N/A",
+    seats: booking.seats_booked,
+    price: booking.total_price || booking.price_per_seat,
+    vehicle: `${booking.car_make || "N/A"} ${booking.car_color ? `(${booking.car_color})` : ""}`.trim(),
   };
 
   const getStatusConfig = (status) => {
@@ -74,9 +68,39 @@ function BookingDetails() {
     setIsModalOpen(true);
   };
 
-  const handleConfirmCancel = () => {
-    console.log("Booking cancelled");
-    setIsModalOpen(false);
+  const handleConfirmCancel = async () => {
+    const userId = localStorage.getItem("userId");
+    const role = "driver";
+
+    try {
+      const res = await fetch(`http://localhost/api/bookings/${booking.booking_id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          "X-User-ID": userId,
+          "X-User-Role": role,
+        },
+      });
+
+      if (!res.ok) {
+        const error = await res.json();
+        console.error("Failed to cancel booking:", error);
+        alert("Failed to cancel booking. Please try again.");
+        return;
+      }
+
+      const result = await res.json();
+      console.log("Booking cancelled successfully:", result);
+      
+      setIsModalOpen(false);
+      
+      alert("Booking cancelled successfully!");
+      navigate(-1); 
+      
+    } catch (error) {
+      console.error("Error cancelling booking:", error);
+      alert("An error occurred. Please try again.");
+    }
   };
 
   const handleCloseModal = () => {
@@ -111,9 +135,9 @@ function BookingDetails() {
           <TripInformationCard trip={trip} />
         </div>
 
-        <div className="mb-6">
+        {/* <div className="mb-6">
           <DriverInformationCard driver={driver} />
-        </div>
+        </div> */}
 
         <div className="rounded-lg border border-gray-200 bg-white p-6">
           <button
@@ -136,6 +160,30 @@ function BookingDetails() {
 
 export default BookingDetails;
 
-export async function loader() {
-  
+// Loader function to fetch booking data
+export async function loader({ params }) {
+  const { bookingId } = params;
+  const userId = localStorage.getItem("userId"); // Get userId from localStorage
+  const role = "driver"; 
+
+  try {
+    const res = await fetch(`http://localhost/api/bookings/${bookingId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "X-User-ID": userId,
+        "X-User-Role": role,
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error("Failed to fetch booking details");
+    }
+
+    const booking = await res.json();
+    return booking;
+  } catch (error) {
+    console.error("Error fetching booking:", error);
+    throw error; // React Router will handle the error
+  }
 }

@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/bookings", tags=["bookings"])
 
-@router.post("/", response_model=BookingCreateResponse, status_code=202)
+@router.post("/", response_model=BookingResponse, status_code=202)
 async def create_booking(
     booking_data: BookingCreate,
     x_user_id: str = Header(..., alias="X-User-ID"),
@@ -29,6 +29,7 @@ async def create_booking(
 ):
     """Create a new booking with distributed locking"""
     logger.info(f"Creating booking for user {x_user_id}, ride {booking_data.ride_id}")
+    logger.info(f"Booking data received: {booking_data.model_dump()}")
     
     booking_service = BookingService(db)
     lock_service = LockService()
@@ -74,14 +75,7 @@ async def create_booking(
 
         logger.info(f"Booking created: {booking.booking_id}")
         
-        return BookingCreateResponse(
-            success=True,
-            booking_id=booking.booking_id,
-            status=BookingStatus.PENDING,
-            message="Your booking is being processed.",
-            estimated_confirmation_time="30 seconds",
-            created_at=booking.created_at
-        )
+        return booking
         
     finally:
         if lock_acquired:
