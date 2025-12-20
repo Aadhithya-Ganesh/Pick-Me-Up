@@ -23,7 +23,10 @@ class BookingService:
     ) -> Booking:
 
         booking_id = self.generate_booking_id()
-
+        total_price = None
+        if booking_data.price:
+            total_price = booking_data.price * booking_data.seats_requested
+            
         booking = Booking(
             booking_id=booking_id,
             user_id=user_id,
@@ -32,6 +35,17 @@ class BookingService:
             status=BookingStatus.PENDING,
             pickup_location=booking_data.pickup_location,
             dropoff_location=booking_data.dropoff_location,
+            total_price=total_price,
+            price_per_seat=booking_data.price,
+            duration=booking_data.duration,
+            departure_time=booking_data.time,  
+            ride_date=booking_data.date,
+            car_make=booking_data.car_make,
+            car_color=booking_data.car_color,
+            license_plate=booking_data.license_plate,
+            driver_name=booking_data.driver_name,
+            origin=booking_data.origin,
+            destination=booking_data.destination,
             created_at=datetime.utcnow()
         )
         

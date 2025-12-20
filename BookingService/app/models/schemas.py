@@ -18,6 +18,22 @@ class BookingCreate(BaseModel):
     pickup_location: Optional[str] = Field(None, max_length=500, description="Pickup location")
     dropoff_location: Optional[str] = Field(None, max_length=500, description="Drop-off location")
     
+    # Ride details
+    price: Optional[float] = Field(None, description="Price per seat")
+    duration: Optional[str] = Field(None, description="Ride duration")
+    time: Optional[str] = Field(None, description="Departure time")
+    date: Optional[str] = Field(None, description="Ride date")
+    
+    # Vehicle details
+    car_make: Optional[str] = Field(None, description="Car make")
+    car_color: Optional[str] = Field(None, description="Car color")
+    license_plate: Optional[str] = Field(None, description="License plate")
+    driver_name: Optional[str] = Field(None, description="Driver name")
+    
+    # Origin/Destination
+    origin: Optional[str] = Field(None, description="Origin location")
+    destination: Optional[str] = Field(None, description="Destination location")
+    
     @field_validator('seats_requested')
     @classmethod
     def seats_must_be_positive(cls, v):
@@ -26,6 +42,7 @@ class BookingCreate(BaseModel):
         if v > 10:
             raise ValueError('Cannot book more than 10 seats at once')
         return v
+
 
 class BookingCancel(BaseModel):
     """Schema for cancelling a booking"""
@@ -47,7 +64,17 @@ class BookingResponse(BaseModel):
     cancelled_at: Optional[datetime] = None
     completed_at: Optional[datetime] = None
     cancellation_reason: Optional[str] = None
-    
+    price_per_seat: Optional[float] = None
+    duration: Optional[str] = None
+    departure_time: Optional[str] = None
+    ride_date: Optional[str] = None
+    car_make: Optional[str] = None
+    car_color: Optional[str] = None
+    license_plate: Optional[str] = None
+    driver_name: Optional[str] = None
+    origin: Optional[str] = None
+    destination: Optional[str] = None
+
     class Config:
         from_attributes = True  # Allows conversion from SQLAlchemy models
 
