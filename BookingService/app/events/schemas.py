@@ -8,6 +8,7 @@ class BaseEvent(BaseModel):
     timestamp: datetime = Field(default_factory=datetime.utcnow)
     instance_id: Optional[str] = None
 
+# Events Published BY Booking Service
 class SeatReserveRequestedEvent(BaseEvent):
     # Published when user creates a booking
     event_type: str = "seat.reserve_requested"

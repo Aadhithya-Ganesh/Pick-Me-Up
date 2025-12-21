@@ -45,7 +45,7 @@ function App() {
                 </ProtectedRoute>
               ),                
               children: [
-                { index: true, element: <ProfilePage /> },
+                { index: true, element: <NotificationsPage /> },
                 { path: "notifications", element: <NotificationsPage /> },
                 {
                   path: "booking",
