@@ -146,6 +146,8 @@ docker compose downn # include -v to remove the volumes
 [minikube](https://minikube.sigs.k8s.io/docs/start/?arch=%2Fwindows%2Fx86-64%2Fstable%2F.exe+download)
 [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl-windows/)
 
+NOTE: Since the deployment is done with minikube, the app is not working properly in Mac systems. Use Windows or Linux for testing.
+
 #### Steps
 
 1. Start Minikube

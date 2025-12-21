@@ -35,7 +35,11 @@ services:
       retries: 5
 
   ride-service:
-    build: ./RideService
+    build:
+      context: ./RideService
+      platforms:
+        - linux/amd64
+        - linux/arm64
     image: aadhithya123/ride-service
     container_name: ride-service
     ports:
@@ -66,7 +70,11 @@ services:
       start_period: 30s
 
   user-service:
-    build: ./UserService
+    build:
+      context: ./UserService
+      platforms:
+        - linux/amd64
+        - linux/arm64
     image: aadhithya123/user-service
     container_name: user-service
     networks:
@@ -95,7 +103,11 @@ services:
       start_period: 30s
 
   booking-service:
-    build: ./BookingService
+    build:
+      context: ./BookingService
+      platforms:
+        - linux/amd64
+        - linux/arm64
     image: aadhithya123/booking-service
     container_name: booking-service
     ports:
@@ -128,7 +140,11 @@ services:
       start_period: 30s
 
   notification-service:
-    build: ./NotificationService
+    build:
+      context: ./NotificationService
+      platforms:
+        - linux/amd64
+        - linux/arm64
     image: aadhithya123/notification-service
     container_name: notification-service
     ports:
@@ -179,7 +195,11 @@ services:
       start_period: 30s
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      platforms:
+        - linux/amd64
+        - linux/arm64
     image: aadhithya123/frontend
     ports:
       - "80:80"
