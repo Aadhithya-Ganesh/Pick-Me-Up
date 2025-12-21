@@ -19,7 +19,7 @@ class RideService:
     def get_rides(db: Session, user_id: str) -> List[Rides]:
         return (
             db.query(Rides)
-            .filter(Rides.user_id != user_id and Rides.seats > 0)
+            .filter(Rides.user_id != user_id)
             .all()
         )
     

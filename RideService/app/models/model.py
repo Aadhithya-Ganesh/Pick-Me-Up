@@ -33,6 +33,7 @@ class Rides(Base):
     license_plate = Column(String, nullable=False)
 
     notes = Column(Text)
+    instant_booking = Column(Boolean, default=False)
 
     # 1 Ride → Many Pending Requests
     pending_requests = relationship(

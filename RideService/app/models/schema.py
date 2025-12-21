@@ -47,6 +47,7 @@ class RideBase(BaseModel):
     car_color: str
     license_plate: str
     notes: Optional[str] = None
+    instant_booking: bool = False
 
 
 class RideCreate(RideBase):
@@ -67,6 +68,7 @@ class RideUpdate(BaseModel):
     car_color: Optional[str] = None
     license_plate: Optional[str] = None
     notes: Optional[str] = None
+    instant_booking: Optional[bool] = None
 
 
 class RideResponse(RideBase):
