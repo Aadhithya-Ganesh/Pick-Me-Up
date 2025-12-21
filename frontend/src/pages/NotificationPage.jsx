@@ -13,10 +13,11 @@ export default function NotificationsPage() {
 
     axios
       .get(`http://localhost/api/notifications/${userId}`)
-      .then(res => setNotifications(res.data))
-      .catch(() => {
-        setNotifications([]);
-      });
+      .then(res => { 
+        setNotifications(res.data);
+        localStorage.setItem(`notifications_last_seen_${userId}`, new Date().toISOString());
+      })
+      .catch(() => setNotifications([]));
   }, [userId]);
 
 if (notifications.length === 0) {

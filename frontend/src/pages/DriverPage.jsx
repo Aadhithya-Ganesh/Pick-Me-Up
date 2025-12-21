@@ -97,6 +97,8 @@ function DriverPage() {
 
       const data = await response.json();
       console.log("API Response:", data);
+
+      window.dispatchEvent(new Event("notifications:refresh")); //Notify to Navbar immediately
       navigate(`/rides/${data.id}`);
     } catch (error) {
       console.error("API ERROR:");

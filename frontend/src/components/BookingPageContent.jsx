@@ -22,7 +22,6 @@ function BookingPageContent({ ride }) {
     }
 
     try {
-      // console.log(ride);
       const res = await fetch("http://localhost/api/bookings/", {
         method: "POST",
         headers: {
@@ -48,8 +47,6 @@ function BookingPageContent({ ride }) {
         }),
       });
 
-
-
       if (!res.ok) {
         const err = await res.json();
         console.error(err);
@@ -58,6 +55,7 @@ function BookingPageContent({ ride }) {
 
       const result = await res.json();
       console.log(result);
+      window.dispatchEvent(new Event("notifications:refresh")); // Notify to Navbar immediately
       navigate(`/booking/${result.booking_id}`);
     } catch (err) {
       console.error(err);
