@@ -10,6 +10,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 class EventService:
+    # ----
     @staticmethod
     async def publish_ride_published(ride):
         event = RidePublishedEvent(
@@ -22,13 +23,16 @@ class EventService:
             routing_key="ride.published",
             message=event.model_dump(mode="json"),
         )
+    # -----
     @staticmethod
     async def publish_seat_reserved(pending_request):
         event = SeatReservedEvent(
             booking_id=pending_request.booking_id,
             ride_id=pending_request.ride_id,
             seats=pending_request.seats,
+            # ---
             user_id=pending_request.user_id
+            # ---
         )
 
         await rabbitmq_client.publish_event(

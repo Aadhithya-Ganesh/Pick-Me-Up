@@ -1,79 +1,31 @@
-import axios from "axios";
-import { User2, LogOut, Bell } from "lucide-react";
+import { User2, LogOut } from "lucide-react";
 import { NavLink, useNavigate, useSubmit } from "react-router-dom";
 import Logo from "./Logo";
 import { Menu, MenuItem } from "@mui/material";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import maleAvatar from "../assets/MaleUser.png";
 import femaleAvatar from "../assets/FemaleUser.png";
 import defaultAvatar from "../assets/User.png";
 
 function Navbar() {
-  const [token, setToken] = useState(localStorage.getItem("token"));
-  const [userId,setUserId] = useState(localStorage.getItem("userId"));
+  const token = localStorage.getItem("token");
+
   const [username, setUsername] = useState(localStorage.getItem("username"));
   const [gender, setGender] = useState(localStorage.getItem("gender"));
 
-  const [notifications, setNotifications] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
-
   const navigate = useNavigate();
   const submit = useSubmit();
 
-  const lastSeenKey = useMemo(() => {
-    return userId? `notifications_last_seen_${userId}` : null;
-  }, [userId]);
-
-  const syncAuthFromStorage = () => {
-    setToken(localStorage.getItem("token"));
-    setUserId(localStorage.getItem("userId"));
-    setUsername(localStorage.getItem("username"));
-    setGender(localStorage.getItem("gender"));
-  }
-
   useEffect(() => {
-    syncAuthFromStorage();
+    const syncUser = () => {
+      setUsername(localStorage.getItem("username"));
+      setGender(localStorage.getItem("gender"));
+    };
+
+    window.addEventListener("storage", syncUser);
+    return () => window.removeEventListener("storage", syncUser);
   }, []);
-  useEffect(() => {
-    window.addEventListener("storage", syncAuthFromStorage);
-    return () => window.removeEventListener("storage", syncAuthFromStorage);
-  }, []);
-  
-  // Notification fetch
-  const fetchNotifications =  async () => {
-    if (!token || !userId) return;
-    try {
-      const res = await axios.get(`http://localhost/api/notifications/${userId}`);
-      setNotifications(res.data);
-    } catch {
-      setNotifications([]);
-    }
-  };
-
-  useEffect(() => {
-    fetchNotifications();
-    if (!token || !userId) return;
-    const interval = setInterval(fetchNotifications, 5000);
-    return() => clearInterval(interval);
-  }, [token, userId]);
-
-  // Immediate refresh when notifies
-  useEffect(() => {
-    const forceRefresh = () => fetchNotifications();
-    window.addEventListener("notifications:refresh", forceRefresh);
-      return () =>
-        window.removeEventListener("notifications:refresh", forceRefresh);
-    }, [token, userId]);
-
-    const lastSeen = lastSeenKey ? localStorage.getItem(lastSeenKey) : null;
-    const newCount = useMemo(() => {
-      if(!userId) return 0;
-      if(!lastSeen) return notifications.length;
-
-      const lastSeenDate = new Date(lastSeen);
-      return notifications.filter((n) => 
-        new Date(n.created_at) > lastSeenDate).length;
-    }, [notifications, lastSeen, userId]);
 
   let AvatarIcon;
   if (gender === "Male") AvatarIcon = maleAvatar;
@@ -90,14 +42,12 @@ function Navbar() {
 
   const handleLogoutClick = () => {
     submit(null, { method: "post", action: "/logout" });
-    setTimeout(() => syncAuthFromStorage(), 0);
   };
 
-return (
-    <div className="sticky top-0 z-50 flex items-center justify-between bg-background px-10 backdrop-blur">
+  return (
+    <div className="bg-background sticky top-0 z-100 flex items-center justify-between px-10 backdrop-blur supports-backdrop-filter:bg-white/80">
       <Logo />
 
-      {/* CENTER LINKS */}
       <div className="flex w-[40%] items-center justify-center gap-6 font-bold">
         {[
           { to: "/", label: "Home" },
@@ -107,21 +57,19 @@ return (
             key={to}
             to={to}
             className={({ isActive }) =>
-              `group relative inline-flex items-center justify-center rounded-xl px-4 py-2 transition ${
+              `group relative inline-flex items-center justify-center rounded-xl px-4 py-2 shadow-2xl transition-all duration-300 ease-in-out ${
                 isActive
-                  ? "text-primary bg-secondary"
+                  ? "text-primary bg-secondary shadow-sm backdrop-blur-sm"
                   : "hover:text-primary hover:bg-secondary text-text"
               }`
             }
           >
-            {label}
+            <span className="relative z-10">{label}</span>
           </NavLink>
         ))}
       </div>
-    
-      <div className="flex items-center gap-4">
-      {!token ? (
-        <>
+
+      {!token && (
         <ul className="flex items-center gap-2">
           <li>
             <NavLink
@@ -140,21 +88,10 @@ return (
             </NavLink>
           </li>
         </ul>
-        </>
-      ): (
-        <>
-        <NavLink
-            to="/dashboard/notifications"
-            className="relative"
-          >
-            <Bell size={25} />
-            {newCount > 0 && (
-              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-2 rounded-full">
-                {newCount}
-              </span>
-            )}
-          </NavLink>
+      )}
 
+      {token && (
+        <>
           <button
             type="button"
             onClick={handleMenuOpen}
@@ -230,10 +167,7 @@ return (
         </>
       )}
     </div>
-    </div>
-);
+  );
 }
 
-
 export default Navbar;
-

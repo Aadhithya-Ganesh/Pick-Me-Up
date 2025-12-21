@@ -6,6 +6,7 @@ class NotificationResponse(BaseModel):
     user_id: str
     type: str
     message: str
+    is_read: bool
     created_at: datetime
 
     class Config:

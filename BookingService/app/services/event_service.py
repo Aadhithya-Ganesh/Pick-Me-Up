@@ -23,7 +23,7 @@ class EventService:
         )
         connection = await aio_pika.connect_robust(rabbitmq_url)
         return connection
-
+    # ----------------
     @staticmethod
     async def publish_booking_created(booking):
         event = {
@@ -40,6 +40,7 @@ class EventService:
             message=event
         )
         logger.info(f"[EVENT] booking.created → booking={booking.id}")
+    # ----------
     
     @staticmethod
     async def publish_event(exchange_name: str, routing_key: str, message: dict):
@@ -47,11 +48,14 @@ class EventService:
             connection = await EventService.get_rabbitmq_connection()
             channel = await connection.channel()
             
+            # exchange = await channel.get_exchange(exchange_name)
+            #-----------------
             exchange = await channel.declare_exchange(
             name=exchange_name,
             type=aio_pika.ExchangeType.TOPIC,
             durable=True
         )
+            # -------------- 
             message_body = json.dumps(message).encode()
             
             rabbitmq_message = aio_pika.Message(

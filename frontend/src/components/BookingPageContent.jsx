@@ -58,8 +58,6 @@ function BookingPageContent({ ride }) {
 
       const result = await res.json();
       console.log(result);
-      // 🔔 notify navbar immediately
-      window.dispatchEvent(new Event("notifications:refresh"));
       navigate(`/booking/${result.booking_id}`);
     } catch (err) {
       console.error(err);

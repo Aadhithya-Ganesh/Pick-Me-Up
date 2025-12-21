@@ -1,6 +1,6 @@
 import { Await, useLoaderData } from "react-router-dom";
 import { Suspense, useEffect } from "react";
-import { MapPin, Calendar, Users, Car } from "lucide-react";
+import { MapPin, Calendar, Users } from "lucide-react";
 import BackdropLoader from "../utils/BackdropLoader";
 import { Link } from "react-router-dom";
 import { useRevalidator } from "react-router-dom";
@@ -18,9 +18,9 @@ function BookingCard({ booking }) {
       {/* LEFT */}
       <div className="flex gap-6">
         <div className="flex flex-col items-center">
-          <MapPin className="text-yellow-500" />
+          <MapPin className="text-blue-500" />
           <div className="h-10 w-px bg-gray-300"></div>
-          <MapPin className="text-yellow-500" />
+          <MapPin className="text-blue-500" />
         </div>
 
         <div>
@@ -75,7 +75,7 @@ function BookingCard({ booking }) {
         </button> */}
         <Link
           to={`/booking/${booking.booking_id}`}
-          className="bg-primary px-4 py-2 border rounded-xl text-sm font-semibold hover:bg-gray-50"
+          className="px-4 py-2 border rounded-lg text-sm font-semibold hover:bg-gray-50"
           >
           View Details
         </Link>
@@ -89,7 +89,7 @@ export default function MyBooking() {
    const revalidator = useRevalidator();
 
   useEffect(() => {
-    revalidator.revalidate();
+    revalidator.revalidate(); // 👈 force refetch
   }, []);
   return (
     <div className="m-8">      
@@ -97,14 +97,7 @@ export default function MyBooking() {
         <Await resolve={data}>
           {(bookings) =>
             !bookings || bookings.length === 0 ? (
-              <div className="w-full rounded-2xl border border-gray-200 p-20">
-                <div className="m-auto flex w-fit items-center gap-5">
-                  <Car size={48} color="#b8b7b7" />
-                  <span className="inline text-center text-2xl font-semibold text-gray-500">
-                    No Bookings Yet.
-                  </span>
-                </div>
-              </div>
+              <p className="text-gray-500">No bookings yet</p>
             ) : (
               <div className="space-y-6">
                 {bookings.map((b) => (
