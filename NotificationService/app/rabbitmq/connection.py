@@ -11,7 +11,6 @@ async def connect_rabbitmq(max_retries: int = 20, delay_seconds:int = 3):
             logger.info(f"RabbitMQ Connecting...attempt {attempt}/{max_retries}) to {RABBITMQ_URL}")
             connection = await aio_pika.connect_robust(RABBITMQ_URL)
             channel = await connection.channel()
-            logger.info("RabbitMQ connected and channel opened...")
             return channel
         
         except Exception as e:

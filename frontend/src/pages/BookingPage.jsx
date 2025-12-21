@@ -1,5 +1,5 @@
-import { Suspense, useState } from "react";
-import { Await, useLoaderData, useNavigate } from "react-router-dom";
+import { Suspense} from "react";
+import { Await, useLoaderData} from "react-router-dom";
 import BackdropLoader from "../utils/BackdropLoader";
 import BookingPageContent from "../components/BookingPageContent";
 

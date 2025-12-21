@@ -12,7 +12,6 @@ from app.rabbitmq.event_service import EventService
 
 router = APIRouter(prefix="/api/rides", tags=["rides"])
 
-# ----
 @router.post("/", response_model=RideResponse, status_code=201)
 async def create_ride(ride: RideCreate, db: Session = Depends(get_db)):
     new_ride = RideService.create_ride(db, ride)
@@ -20,7 +19,7 @@ async def create_ride(ride: RideCreate, db: Session = Depends(get_db)):
     await EventService.publish_ride_published(new_ride)
 
     return new_ride
-# ---
+
 @router.get("/rides", response_model=List[RideResponse])
 def get_all_rides(user_id: str, db: Session = Depends(get_db)):
     return RideService.get_rides(db, user_id)
