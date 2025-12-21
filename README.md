@@ -1,54 +1,56 @@
-# 🚗 PickMeUp – Ride Sharing Microservices Platform  
+# 🚗 PickMeUp – Ride Sharing Microservices Platform
 
 PickMeUp is a scalable, event-driven microservices-based ride-sharing platform.  
 Each service is independently deployable, containerized, and communicates via REST and RabbitMQ events.
 
 The platform enables:
+
 - User Authentication + JWT
 - Drivers to create rides
 - Users to book rides
 - Notifications via event consumption
 - API Gateway routing via Nginx
 
-## 🏗 Architecture Overview  
+## 🏗 Architecture Overview
 
 PickMeUp is implemented following microservices principles and deployed as containerized workloads.
 
-### System Components  
+### System Components
 
-| Component | Responsibilities |
-|----------|------------------|
-| **Frontend Pod (React)** | UI for users |
-| **NGINX Gateway Pod** | Routes `/api/*` endpoints to backend services |
-| **User Service Pod (FastAPI)** | Authentication, user creation, JWT handling |
-| **Ride Service Pod (FastAPI)** | Ride creation, listing rides, driver responses |
-| **Booking Service Pod (FastAPI)** | Booking rides, Redis locking to prevent race conditions |
-| **Notification Service Pod (FastAPI)** | Consumes booking/ride events + sends notifications |
-| **RabbitMQ Broker Pod** | Event communication between services |
-| **PostgreSQL DB per service** | Decoupled data storage |
+| Component                              | Responsibilities                                        |
+| -------------------------------------- | ------------------------------------------------------- |
+| **Frontend Pod (React)**               | UI for users                                            |
+| **NGINX Gateway Pod**                  | Routes `/api/*` endpoints to backend services           |
+| **User Service Pod (FastAPI)**         | Authentication, user creation, JWT handling             |
+| **Ride Service Pod (FastAPI)**         | Ride creation, listing rides, driver responses          |
+| **Booking Service Pod (FastAPI)**      | Booking rides, Redis locking to prevent race conditions |
+| **Notification Service Pod (FastAPI)** | Consumes booking/ride events + sends notifications      |
+| **RabbitMQ Broker Pod**                | Event communication between services                    |
+| **PostgreSQL DB per service**          | Decoupled data storage                                  |
 
+## ⚙ Platform Workflow
 
+### 1. User authenticates
 
-## ⚙ Platform Workflow  
+- User credentials validated
+- JWT generated + stored
 
-### 1. User authenticates  
-- User credentials validated  
-- JWT generated + stored  
+### 2. Driver creates ride
 
-### 2. Driver creates ride  
-- Ride Service stores ride details  
-- `ride.published` event emitted  
+- Ride Service stores ride details
+- `ride.published` event emitted
 
-### 3. User books ride  
-- Booking Service validates seat availability  
-- Booking confirmed + event published  
+### 3. User books ride
 
-### 4. Notifications  
-- Notification Service consumes events  
-- Sends real-time notification messages  
+- Booking Service validates seat availability
+- Booking confirmed + event published
 
+### 4. Notifications
 
-## 🔀 API Routing via Gateway  
+- Notification Service consumes events
+- Sends real-time notification messages
+
+## 🔀 API Routing via Gateway
 
 All external traffic goes through NGINX:
 
@@ -58,23 +60,20 @@ All external traffic goes through NGINX:
 - /api/bookings/
 - /api/notifications/
 
-
 Services communicate internally via Docker DNS/K8s networking.
 
+## 🧱 Data Management
 
-## 🧱 Data Management  
+PickMeUp follows a **database per microservice** pattern:
 
-PickMeUp follows a **database per microservice** pattern:  
-
-- `users_db`  
-- `rides_db`  
-- `bookings_db`  
-- `notifications_db`  
+- `users_db`
+- `rides_db`
+- `bookings_db`
+- `notifications_db`
 
 This enforces service boundaries and independent schema evolution.
 
-
-## 📨 Event-Driven Messaging  
+## 📨 Event-Driven Messaging
 
 RabbitMQ transports domain events including:
 
@@ -85,32 +84,34 @@ RabbitMQ transports domain events including:
 
 These enable eventual consistency and decoupled workflows.
 
+## 🛠 Tech Stack
 
-
-## 🛠 Tech Stack  
-
-| Category | Tools |
-|---------|------|
-| Languages | Python |
-| Frameworks | FastAPI |
-| Frontend | React |
-| Databases | PostgreSQL |
-| Messaging | RabbitMQ |
-| Gateway | NGINX |
-| Security | JWT |
+| Category   | Tools               |
+| ---------- | ------------------- |
+| Languages  | Python              |
+| Frameworks | FastAPI             |
+| Frontend   | React               |
+| Databases  | PostgreSQL          |
+| Messaging  | RabbitMQ            |
+| Gateway    | NGINX               |
+| Security   | JWT                 |
 | Deployment | Docker / Kubernetes |
 
-## 🚀 Docker deployment  
+## 🚀 Docker deployment
 
-Using Docker Compose:
+#### Prerequisites
 
-1.In the root directory
+[Docker](https://www.docker.com/)
+
+#### Steps
+
+1. In the root directory
 
 ```bash
 docker compose up --build
 ```
 
-2.Visit the below url 
+2. Visit the below url
 
 ```bash
 localhost
@@ -136,4 +137,47 @@ To stop the services
 docker compose downn # include -v to remove the volumes
 ```
 
-## Kubernetes Deployment
+## 🚀 Kubernetes Deployment
+
+#### prerequisites
+
+[minikube](https://minikube.sigs.k8s.io/docs/start/?arch=%2Fwindows%2Fx86-64%2Fstable%2F.exe+download)
+[kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl-windows/)
+
+#### Steps
+
+1. Start Minikube
+
+```bash
+minikube start --driver=docker
+```
+
+2. Go into the kubernetes folder
+
+```bash
+cd kubernetes
+```
+
+3. Apply the deployments and services to the minikube cluster
+
+```bash
+kubectl apply -f .
+```
+
+4. Forward the port of the frontend service to the host machine
+
+```bash
+kubectl port-forward service/frontend 80:80
+```
+
+5. Visit
+
+```bash
+localhost
+```
+
+6. Delete the deployments 
+
+```bash
+kubectl delete -f .
+```
