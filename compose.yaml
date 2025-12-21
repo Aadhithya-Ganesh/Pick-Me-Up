@@ -36,6 +36,7 @@ services:
 
   ride-service:
     build: ./RideService
+    image: aadhithya123/ride-service
     container_name: ride-service
     ports:
       - "8081:8081"
@@ -66,6 +67,7 @@ services:
 
   user-service:
     build: ./UserService
+    image: aadhithya123/user-service
     container_name: user-service
     networks:
       - backend
@@ -94,6 +96,7 @@ services:
 
   booking-service:
     build: ./BookingService
+    image: aadhithya123/booking-service
     container_name: booking-service
     ports:
       - "8080:8080"
@@ -123,9 +126,10 @@ services:
       timeout: 30s
       retries: 5
       start_period: 30s
-  
+
   notification-service:
     build: ./NotificationService
+    image: aadhithya123/notification-service
     container_name: notification-service
     ports:
       - "8003:8003"
@@ -157,12 +161,14 @@ services:
   database:
     image: postgres:18-alpine
     container_name: db
+    ports:
+      - "5432:5432"
     env_file:
       - .env
     networks:
       - backend
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - postgres-data:/var/lib/postgresql
       - ./create-db.sql:/docker-entrypoint-initdb.d/01_create_dbs.sql:ro
     restart: unless-stopped
     healthcheck:
@@ -174,6 +180,7 @@ services:
 
   frontend:
     build: ./frontend
+    image: aadhithya123/frontend
     ports:
       - "80:80"
     networks:

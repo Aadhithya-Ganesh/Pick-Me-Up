@@ -7,7 +7,8 @@ from app.core.rabbitmq import init_rabbitmq, close_rabbitmq, get_rabbitmq_health
 from app.api.v1 import bookings
 import logging
 import asyncio
-from app.workers.event_consumer import start_consumer  
+from app.workers.event_consumer import start_consumer
+from fastapi.responses import JSONResponse
 
 # Configure logging
 logging.basicConfig(
@@ -81,28 +82,29 @@ async def root():
 
 @app.get("/health")
 async def health_check():
-    """Health check endpoint - used by load balancer"""
     db_health = get_db_health()
     redis_health = get_redis_health()
     rabbitmq_health = get_rabbitmq_health()
-    
-    # Overall health status
+
     is_healthy = (
         db_health["status"] == "connected" and 
         redis_health["status"] == "connected" and
         rabbitmq_health["status"] == "connected"
     )
-    
-    return {
-        "status": "healthy" if is_healthy else "unhealthy",
-        "service": settings.APP_NAME,
-        "instance_id": settings.INSTANCE_ID,
-        "checks": {
-            "database": db_health["status"],
-            "redis": redis_health["status"],
-            "rabbitmq": rabbitmq_health["status"]
+
+    return JSONResponse(
+        status_code=200 if is_healthy else 503,
+        content={
+            "status": "healthy" if is_healthy else "unhealthy",
+            "service": settings.APP_NAME,
+            "instance_id": settings.INSTANCE_ID,
+            "checks": {
+                "database": db_health["status"],
+                "redis": redis_health["status"],
+                "rabbitmq": rabbitmq_health["status"]
+            }
         }
-    }
+    )
 
 @app.get("/ready")
 async def readiness_check():
