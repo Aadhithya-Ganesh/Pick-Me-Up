@@ -1,4 +1,3 @@
-import RideSearchForm from "./RideSearchForm";
 
 function RidePageHeader() {
   return (

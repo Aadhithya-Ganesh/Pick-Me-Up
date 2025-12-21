@@ -1,31 +1,79 @@
-import { User2, LogOut } from "lucide-react";
+import axios from "axios";
+import { User2, LogOut, Bell } from "lucide-react";
 import { NavLink, useNavigate, useSubmit } from "react-router-dom";
 import Logo from "./Logo";
 import { Menu, MenuItem } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import maleAvatar from "../assets/MaleUser.png";
 import femaleAvatar from "../assets/FemaleUser.png";
 import defaultAvatar from "../assets/User.png";
 
 function Navbar() {
-  const token = localStorage.getItem("token");
-
+  const [token, setToken] = useState(localStorage.getItem("token"));
+  const [userId,setUserId] = useState(localStorage.getItem("userId"));
   const [username, setUsername] = useState(localStorage.getItem("username"));
   const [gender, setGender] = useState(localStorage.getItem("gender"));
 
+  const [notifications, setNotifications] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
+
   const navigate = useNavigate();
   const submit = useSubmit();
 
-  useEffect(() => {
-    const syncUser = () => {
-      setUsername(localStorage.getItem("username"));
-      setGender(localStorage.getItem("gender"));
-    };
+  const lastSeenKey = useMemo(() => {
+    return userId? `notifications_last_seen_${userId}` : null;
+  }, [userId]);
 
-    window.addEventListener("storage", syncUser);
-    return () => window.removeEventListener("storage", syncUser);
+  const syncAuthFromStorage = () => {
+    setToken(localStorage.getItem("token"));
+    setUserId(localStorage.getItem("userId"));
+    setUsername(localStorage.getItem("username"));
+    setGender(localStorage.getItem("gender"));
+  }
+
+  useEffect(() => {
+    syncAuthFromStorage();
   }, []);
+  useEffect(() => {
+    window.addEventListener("storage", syncAuthFromStorage);
+    return () => window.removeEventListener("storage", syncAuthFromStorage);
+  }, []);
+  
+  // Notification fetch
+  const fetchNotifications =  async () => {
+    if (!token || !userId) return;
+    try {
+      const res = await axios.get(`http://localhost/api/notifications/${userId}`);
+      setNotifications(res.data);
+    } catch {
+      setNotifications([]);
+    }
+  };
+
+  useEffect(() => {
+    fetchNotifications();
+    if (!token || !userId) return;
+    const interval = setInterval(fetchNotifications, 5000);
+    return() => clearInterval(interval);
+  }, [token, userId]);
+
+  // Immediate refresh when notifies
+  useEffect(() => {
+    const forceRefresh = () => fetchNotifications();
+    window.addEventListener("notifications:refresh", forceRefresh);
+      return () =>
+        window.removeEventListener("notifications:refresh", forceRefresh);
+    }, [token, userId]);
+
+    const lastSeen = lastSeenKey ? localStorage.getItem(lastSeenKey) : null;
+    const newCount = useMemo(() => {
+      if(!userId) return 0;
+      if(!lastSeen) return notifications.length;
+
+      const lastSeenDate = new Date(lastSeen);
+      return notifications.filter((n) => 
+        new Date(n.created_at) > lastSeenDate).length;
+    }, [notifications, lastSeen, userId]);
 
   let AvatarIcon;
   if (gender === "Male") AvatarIcon = maleAvatar;
@@ -42,12 +90,14 @@ function Navbar() {
 
   const handleLogoutClick = () => {
     submit(null, { method: "post", action: "/logout" });
+    setTimeout(() => syncAuthFromStorage(), 0);
   };
 
-  return (
-    <div className="bg-background sticky top-0 z-100 flex items-center justify-between px-10 backdrop-blur supports-backdrop-filter:bg-white/80">
+return (
+    <div className="sticky top-0 z-50 flex items-center justify-between bg-background px-10 backdrop-blur">
       <Logo />
 
+      {/* CENTER LINKS */}
       <div className="flex w-[40%] items-center justify-center gap-6 font-bold">
         {[
           { to: "/", label: "Home" },
@@ -57,19 +107,21 @@ function Navbar() {
             key={to}
             to={to}
             className={({ isActive }) =>
-              `group relative inline-flex items-center justify-center rounded-xl px-4 py-2 shadow-2xl transition-all duration-300 ease-in-out ${
+              `group relative inline-flex items-center justify-center rounded-xl px-4 py-2 transition ${
                 isActive
-                  ? "text-primary bg-secondary shadow-sm backdrop-blur-sm"
+                  ? "text-primary bg-secondary"
                   : "hover:text-primary hover:bg-secondary text-text"
               }`
             }
           >
-            <span className="relative z-10">{label}</span>
+            {label}
           </NavLink>
         ))}
       </div>
-
-      {!token && (
+    
+      <div className="flex items-center gap-4">
+      {!token ? (
+        <>
         <ul className="flex items-center gap-2">
           <li>
             <NavLink
@@ -88,10 +140,21 @@ function Navbar() {
             </NavLink>
           </li>
         </ul>
-      )}
-
-      {token && (
+        </>
+      ): (
         <>
+        <NavLink
+            to="/dashboard/notifications"
+            className="relative"
+          >
+            <Bell size={25} />
+            {newCount > 0 && (
+              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-2 rounded-full">
+                {newCount}
+              </span>
+            )}
+          </NavLink>
+
           <button
             type="button"
             onClick={handleMenuOpen}
@@ -167,7 +230,8 @@ function Navbar() {
         </>
       )}
     </div>
-  );
+    </div>
+);
 }
 
 export default Navbar;

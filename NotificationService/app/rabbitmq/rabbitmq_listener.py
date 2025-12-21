@@ -42,21 +42,29 @@ async def handle_message(message: IncomingMessage):
                         type = event_type,
                         message = "Your booking request has been accepted!"
                     ))
-            elif event_type in ["booking.cancelled","booking.expired"]:
+            elif event_type =="booking.expired":
                 user_id = data.get("user_id")
                 if user_id:
+                    user_id = data.get("user_id")
                     db.add(Notification(
                         user_id = user_id,
                         type = event_type,
-                        message = "Your booking request was cancelled!"
+                        message = "Your booking expired due to unavailability!"
                     ))
-            # elif event_type == "ride.cancelled":
-            #     driver_id = data.get("driver_id")
-            #     db.add(Notification(
-            #         user_id=driver_id,
-            #         type=event_type,
-            #         message="Your ride was cancelled"
-            #     ))
+            elif event_type == "booking.cancelled":
+                user_id = data.get("user_id")
+                cancelled_by = data.get("cancelled_by", "SYSTEM")
+
+                if cancelled_by == "USER":
+                    message = "You cancelled your booking!"
+                else:
+                    message = "Your booking was cancelled!"
+                db.add(Notification(
+                user_id = user_id,
+                type = event_type,  
+                message = message
+                ))
+                
             db.commit()
         finally:
             db.close()

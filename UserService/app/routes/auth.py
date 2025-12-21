@@ -13,7 +13,7 @@ router = APIRouter(prefix="/api/auth", tags=["Authentication"])
 def register(user_data: UserCreate, db: Session = Depends(get_db)):
     existing_user = db.query(models.User).filter(models.User.email == user_data.email).first()
     if existing_user:
-        return HTTPException(status_code = 400, detail = "Email Already Registered")
+        raise HTTPException(status_code = 400, detail = "Email Already Registered")
     
     hashed_pw = get_password_hash(user_data.password)
     new_user = models.User(
@@ -36,7 +36,7 @@ def login(credentials: UserLogin, db: Session = Depends(get_db)):
     user = db.query(models.User).filter(models.User.email == credentials.email).first()
 
     if not user or not verify_password(credentials.password, user.hashed_password):
-        raise HTTPException(status_code=401, dtail = "Invalid Email or Phone!")
+        raise HTTPException(status_code=401, detail = "Invalid Email or Phone!")
    
     access_token = create_access_token(
         data={"id": user.id,

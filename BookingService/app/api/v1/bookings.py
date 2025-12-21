@@ -3,7 +3,6 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.models.schemas import (
     BookingCreate, 
-    BookingCreateResponse, 
     BookingResponse,
     BookingListResponse,
     BookingCancel,
@@ -62,12 +61,12 @@ async def create_booking(
             )
         
         booking = booking_service.create_booking(x_user_id, booking_data)
-        # ----------
+
         try:
             await EventService.publish_booking_created(booking)
         except Exception as e:
             logger.error(f"Failed to publish booking.created (booking still created): {e}")
-        # ------------
+
         try:
             await EventService.publish_seat_reserve_requested(booking)
         except Exception as e:
