@@ -22,6 +22,7 @@ spec:
     spec:
       containers:
         - image: aadhithya123/frontend
+          imagePullPolicy: Always
           name: frontend
           ports:
             - containerPort: 80

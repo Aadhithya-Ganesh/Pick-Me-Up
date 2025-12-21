@@ -29,14 +29,6 @@ spec:
             - name: RABBITMQ_DEFAULT_USER
               value: guest
           image: rabbitmq:3-management-alpine
-          livenessProbe:
-            exec:
-              command:
-                - rabbitmq-diagnostics
-                - ping
-            failureThreshold: 5
-            periodSeconds: 10
-            timeoutSeconds: 5
           name: rabbitmq
           ports:
             - containerPort: 5672

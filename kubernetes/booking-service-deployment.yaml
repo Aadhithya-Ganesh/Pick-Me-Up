@@ -28,16 +28,14 @@ spec:
             - configMapRef:
                 name: env
           image: aadhithya123/booking-service
+          imagePullPolicy: Always
           livenessProbe:
-            exec:
-              command:
-                - python
-                - -c
-                - import urllib.request; urllib.request.urlopen('http://localhost:8080/health')
-            failureThreshold: 5
-            initialDelaySeconds: 30
-            periodSeconds: 90
-            timeoutSeconds: 30
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            failureThreshold: 3
           name: booking-service
           ports:
             - containerPort: 8080
