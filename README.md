@@ -27,6 +27,7 @@ PickMeUp is implemented following microservices principles and deployed as conta
 | **Notification Service Pod (FastAPI)** | Consumes booking/ride events + sends notifications      |
 | **RabbitMQ Broker Pod**                | Event communication between services                    |
 | **PostgreSQL DB per service**          | Decoupled data storage                                  |
+| **Redis**                              | Handling racing conditions while booking                |
 
 ## ⚙ Platform Workflow
 
@@ -93,6 +94,7 @@ These enable eventual consistency and decoupled workflows.
 | Frontend   | React               |
 | Databases  | PostgreSQL          |
 | Messaging  | RabbitMQ            |
+| Locking    | Redis               |
 | Gateway    | NGINX               |
 | Security   | JWT                 |
 | Deployment | Docker / Kubernetes |
