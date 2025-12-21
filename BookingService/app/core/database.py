@@ -1,6 +1,5 @@
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
-# from sqlalchemy.pool import StaticPool
 from app.config import settings
 from app.models.booking import Base
 import logging
