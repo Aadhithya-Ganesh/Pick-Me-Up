@@ -1,0 +1,233 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    networks:
+      - backend
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  ride-service:
+    build:
+      context: ./RideService
+      platforms:
+        - linux/amd64
+        - linux/arm64
+    image: aadhithya123/ride-service
+    container_name: ride-service
+    ports:
+      - "8081:8081"
+    networks:
+      - backend
+      - frontend
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/rides?sslmode=disable
+    env_file:
+      - .env
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      database:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:8081/health')",
+        ]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+
+  user-service:
+    build:
+      context: ./UserService
+      platforms:
+        - linux/amd64
+        - linux/arm64
+    image: aadhithya123/user-service
+    container_name: user-service
+    networks:
+      - backend
+      - frontend
+    depends_on:
+      database:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/users?sslmode=disable
+    ports:
+      - "8082:8082"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:8082/health')",
+        ]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+
+  booking-service:
+    build:
+      context: ./BookingService
+      platforms:
+        - linux/amd64
+        - linux/arm64
+    image: aadhithya123/booking-service
+    container_name: booking-service
+    ports:
+      - "8080:8080"
+    networks:
+      - backend
+      - frontend
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/booking?sslmode=disable
+    env_file:
+      - .env
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      database:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:8080/health')",
+        ]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+
+  notification-service:
+    build:
+      context: ./NotificationService
+      platforms:
+        - linux/amd64
+        - linux/arm64
+    image: aadhithya123/notification-service
+    container_name: notification-service
+    ports:
+      - "8003:8003"
+    networks:
+      - backend
+      - frontend
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/notifications?sslmode=disable
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      database:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:8003/health')",
+        ]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+
+  database:
+    image: postgres:18-alpine
+    container_name: db
+    ports:
+      - "5432:5432"
+    env_file:
+      - .env
+    networks:
+      - backend
+    volumes:
+      - postgres-data:/var/lib/postgresql
+      - ./create-db.sql:/docker-entrypoint-initdb.d/01_create_dbs.sql:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  frontend:
+    build:
+      context: ./frontend
+      platforms:
+        - linux/amd64
+        - linux/arm64
+    image: aadhithya123/frontend
+    ports:
+      - "80:80"
+    networks:
+      - frontend
+    depends_on:
+      notification-service:
+        condition: service_healthy
+      ride-service:
+        condition: service_healthy
+      booking-service:
+        condition: service_healthy
+      user-service:
+        condition: service_healthy
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 9080:8080
+    networks:
+      - backend
+
+networks:
+  backend:
+  frontend:
+
+volumes:
+  postgres-data:
+  rabbitmq_data:
+  redis_data:

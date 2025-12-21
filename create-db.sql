@@ -1,0 +1,4 @@
+CREATE DATABASE rides;
+CREATE DATABASE booking;
+CREATE DATABASE users;
+CREATE DATABASE notifications;

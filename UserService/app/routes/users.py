@@ -1,0 +1,47 @@
+from fastapi  import APIRouter, Depends, HTTPException
+from sqlalchemy.orm import Session
+from app.db import get_db
+from app.deps import get_current_user
+from app import models
+from app.schemas import UserResponse,UserUpdate
+
+router = APIRouter(prefix="/api/users", tags=["Users"])
+
+@router.get("/me",response_model=UserResponse)
+def get_current(current_user: models.User = Depends(get_current_user)):
+    return current_user
+
+@router.get("/internal/{user_id}", response_model=UserResponse)
+def get_user_internal(user_id: str, db: Session = Depends(get_db)):
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user
+ 
+@router.put("/me", response_model=UserResponse)
+def update_user(
+    user_data: UserUpdate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    update_dict = user_data.dict(exclude_unset=True)
+
+    for field, value in update_dict.items():
+        setattr(current_user, field, value)
+
+    db.commit()
+    db.refresh(current_user)
+
+    return current_user
+
+@router.delete("/delete")
+def delete_user(db: Session = Depends(get_db),
+                current_user: models.User = Depends(get_current_user)
+                ):
+    if not current_user:
+        raise HTTPException(status_code=404, detail="User Not Found!!")
+    
+    db.delete(current_user)
+    db.commit()
+
+    return{"payload": "User Deleted!!!"}

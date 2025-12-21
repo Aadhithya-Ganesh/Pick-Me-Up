@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe convert -f ./../compose.yaml
+    kompose.version: 1.37.0 (fb0539e64)
+  labels:
+    io.kompose.service: ride-service
+  name: ride-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: ride-service
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: C:\ProgramData\chocolatey\lib\kubernetes-kompose\tools\kompose.exe convert -f ./../compose.yaml
+        kompose.version: 1.37.0 (fb0539e64)
+      labels:
+        io.kompose.service: ride-service
+    spec:
+      containers:
+        - env:
+            - name: DATABASE_URL
+              value: postgresql://postgres:postgres@database:5432/rides?sslmode=disable
+          envFrom:
+            - configMapRef:
+                name: env
+          image: aadhithya123/ride-service
+          imagePullPolicy: Always
+          livenessProbe:
+            exec:
+              command:
+                - python
+                - -c
+                - import urllib.request; urllib.request.urlopen('http://localhost:8081/health')
+            failureThreshold: 5
+            initialDelaySeconds: 30
+            periodSeconds: 90
+            timeoutSeconds: 30
+          name: ride-service
+          ports:
+            - containerPort: 8081
+              protocol: TCP
+      restartPolicy: Always
