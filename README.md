@@ -3,7 +3,7 @@
 PickMeUp is a scalable, event-driven microservices-based ride-sharing platform.  
 Each service is independently deployable, containerized, and communicates via REST and RabbitMQ events.
 
-The platform enables:
+The platform enables :
 
 - User Authentication + JWT
 - Drivers to create rides
@@ -180,7 +180,7 @@ kubectl port-forward service/frontend 80:80
 localhost
 ```
 
-6. Delete the deployments 
+6. Delete the deployments
 
 ```bash
 kubectl delete -f .
